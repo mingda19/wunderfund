@@ -20,6 +20,74 @@ verified against the batched PyTorch training forward pass to ~1e-6
 precision (float32 noise only) before being adopted. No torch dependency
 at inference time — only numpy.
 
+## Weight storage format — not ONNX
+
+Chain from training to deployment:
+
+1. **During training** (`full_training/train_TCN.py`): checkpoints are
+   plain PyTorch (`.pt`, via `torch.save`) containing the model
+   `state_dict` plus optimizer/scheduler state (for resuming) and the
+   architecture config — `runs/<run_name>_best.pt` / `_latest.pt`.
+2. **Post-training conversion** (`full_training/extract_numpy_weights.py`):
+   loads that checkpoint into a `CausalTCN`, reads out each conv layer's
+   effective weight/bias/downsample tensors (PyTorch's `weight_norm`
+   parametrization computes these on access — no manual g/v math needed),
+   and writes them as **plain numpy arrays in a `.npz`** file.
+3. **What's actually deployed**: `tcn_weights_numpy.npz` in this folder —
+   a numpy archive, not a `.pt` and not `.onnx`.
+
+**We deliberately did not export to ONNX**, unlike the baseline GRU. The
+reason is architectural, not a rejection of ONNX in general: the baseline's
+recurrent state is a single hidden vector, which maps directly onto ONNX's
+"pass state in, get state out" per-call pattern
+(`hidden_0`/`hidden_1` in `baseline/solution.py`). Our TCN's fast
+inference instead depends on **7 small per-layer ring buffers** of
+different sizes (the WaveNet-style trick above) — a `torch.onnx.export`
+of `CausalTCN.forward()` as currently written would export the *naive*
+full-window convolution (recompute over the whole 255-step receptive
+field every row), because the incremental buffer logic lives in separate
+hand-written code (`tcn_streaming.py`), not in the model's `forward()`.
+That's exactly the slow path we moved away from (1141µs/row, ~12x over
+budget — see `eda/notes.md` §8).
+
+Getting ONNX to run the *fast* version would mean restructuring
+`CausalTCN.forward()` to take the 7 ring buffers as explicit extra
+inputs and return updated ones as extra outputs (the same pattern as the
+baseline's hidden state, just 7 buffers instead of 2), then exporting
+that. It's a legitimate option — `onnxruntime`'s C++ execution is likely
+faster than our numpy buffer-shuffling, which would help if a future,
+wider/deeper model eats into the latency margin — but it's real
+re-engineering, not a quick swap, and the current numpy path is already
+verified correct and within budget. Worth revisiting if you widen the
+model enough to need the extra speed; not necessary right now.
+
+## Dependencies — what the scoring container needs
+
+**Just `numpy`.** `solution.py`'s only imports outside the local-testing
+`__main__` block are `pathlib` (stdlib) and `numpy`. That's already in
+the organizers' `requirements.txt`
+(`numpy==2.2.6`, alongside `onnxruntime==1.23.2`, `pyarrow==19.0.1` — we
+use neither of those two, they're just what the baseline needs). **No
+email to the organizers needed for this package as it stands.**
+
+This was a deliberate benefit of the numpy-streaming design, not an
+accident: an equivalent torch-based submission would need to add `torch`
+to what's installed, and while the Dockerfile's
+`--extra-index-url https://download.pytorch.org/whl/cpu` strongly implies
+torch is expected to be installable, it is *not* currently listed in the
+starter pack's `requirements.txt` — that would need to be confirmed/
+requested before relying on it (see `docs/submission_guide.md`'s "drop us
+a line" note). We simply never needed to find out.
+
+If a future change adds a dependency, here's what each would need:
+- **Switching to ONNX inference** (see above): none beyond
+  `onnxruntime`, already installed.
+- **Re-adding the LightGBM ensemble** (currently not adopted, see below):
+  would need `lightgbm`, not currently in `requirements.txt` —
+  would require asking the organizers.
+- **PLS factor-compression channels** (`USE_PLS`, currently off): no new
+  dependency — it's a plain numpy matrix projection either way.
+
 ## Training recipe (final)
 
 - Data: 600 train sequences (fresh random sample, seed=1, out of 10,607
@@ -78,12 +146,7 @@ authoritative number on your machine).
 2. **The `a5`/`a7` quantization finding (`eda/notes.md` §9) is not yet
    exploited.** `t0`/`t1` are per-sequence-quantized and `a5`/`a7` predict
    the quantization step at corr 0.65/0.74 — a real, unused lever.
-3. **`requirements.txt` in the starter pack does not list torch** (only
-   numpy/onnxruntime/pyarrow) — irrelevant to *this* package since
-   inference is pure numpy, but the *training* code (`eda/scripts/`) does
-   need torch, so that's a local dev environment concern only, not a
-   submission-time one.
-4. Architecture/hyperparameters (48 channels, 7 layers, RF=255) were not
+3. Architecture/hyperparameters (48 channels, 7 layers, RF=255) were not
    swept — given the latency budget has ~20 min of headroom (39.6 min
    used of 60), a wider/deeper model is affordable and untried.
 
@@ -95,3 +158,27 @@ authoritative number on your machine).
   numpy, no torch needed at inference).
 - `standardization.npz` — the 112-dim mean/std vectors from the full
   train-set streaming pass.
+- `MODEL.md` — this file (not required by `docs/submission_guide.md`, but
+  shown in its example tree and directly useful for the technical-report
+  requirement in `docs/prizes.md` if this solution places).
+
+## Packaging checklist (`docs/submission_guide.md`)
+
+Current folder already satisfies the stated requirements: `solution.py`
+at what would be the zip root, defines `PredictionModel` with
+`predict(self, data_point)`, all weight files load via paths relative to
+`solution.py` (`Path(__file__).resolve().parent`, not absolute paths —
+checked in `_load_weights()`/`_load_standardization()`). Total size ~524KB,
+well under the 20MB limit.
+
+Two things to handle when you zip:
+- **Exclude `__pycache__/`** if present (created by local testing runs;
+  harmless either way, just unnecessary weight in the zip).
+- `solution.py`'s `if __name__ == "__main__":` block does
+  `sys.path.insert(0, str(Path(__file__).resolve().parents[1]))` to reach
+  `utils.py` for local `--validation` testing — that only works when this
+  folder sits directly inside the starter-pack repo (where `utils.py`
+  lives one level up), as it does now. It's irrelevant to actual scoring
+  (the harness imports `PredictionModel` directly, never runs this file's
+  `__main__` block) — only matters if you want to keep running local
+  validation checks from wherever you zip from.

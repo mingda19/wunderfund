@@ -1,1 +1,4 @@
 datasets/
+
+*.zip
+.DS_Store

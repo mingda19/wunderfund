@@ -66,7 +66,22 @@ import pyarrow.parquet as pq
 import torch
 import torch.nn as nn
 
-EDA_SCRIPTS = Path(__file__).resolve().parents[1] / "eda" / "scripts"
+def _find_eda_scripts():
+    """Walk up from this file's location looking for eda/scripts/common.py
+    — resilient to this folder being moved to a different nesting depth
+    (it was originally a sibling of wunderfund/, then moved inside it)."""
+    for ancestor in Path(__file__).resolve().parents:
+        candidate = ancestor / "eda" / "scripts"
+        if (candidate / "common.py").exists():
+            return candidate
+    raise RuntimeError(
+        "could not find eda/scripts/common.py by walking up from "
+        f"{Path(__file__).resolve()} — is eda/ still an ancestor-level sibling "
+        "somewhere above this file? Set EDA_SCRIPTS manually if the layout changed again."
+    )
+
+
+EDA_SCRIPTS = _find_eda_scripts()
 sys.path.insert(0, str(EDA_SCRIPTS))
 
 from common import (ARTIFACTS_DIR as EDA_ARTIFACTS_DIR, TABLES_DIR, FEATURE_COLUMNS,
