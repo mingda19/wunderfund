@@ -26,7 +26,7 @@ _ARTIFACT_DIR = Path(__file__).resolve().parent
 
 
 def _load_weights():
-    d = np.load(_ARTIFACT_DIR / "tcn_weights_numpy.npz")
+    d = np.load(_ARTIFACT_DIR / "tcn_full_best_numpy.npz")
     n_layers = int(d["n_layers"])
     layers = []
     for i in range(n_layers):

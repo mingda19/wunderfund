@@ -2,3 +2,5 @@ datasets/
 
 *.zip
 .DS_Store
+*.pt
+*.npz
