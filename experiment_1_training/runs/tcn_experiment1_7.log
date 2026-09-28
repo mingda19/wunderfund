@@ -1,0 +1,446 @@
+
+=== run start 2026-09-28 11:03:21 — 10607 train seqs, 150 valid seqs, 15 epochs remaining — loss=wp_aligned, layers=7, lr_flat_epochs=8 ===
+  epoch 1/15  batch 50  seqs 800/10607  running_loss=2.2006  lr=2.00e-03  32.58 seq/s  ETA 5.0 min
+
+interrupted — latest checkpoint is already saved after the last completed epoch (re-run with RESUME_FROM = '/Users/mingda/Desktop/wunderfund/wunderfund/experiment_1_training/runs/tcn_experiment1_7_latest.pt' to continue)
+
+=== run start 2026-09-28 11:57:11 — 10607 train seqs, 150 valid seqs, 15 epochs remaining — loss=wp_aligned, layers=7, lr_flat_epochs=8 ===
+  epoch 1/15  batch 50  seqs 800/10607  running_loss=2.2035  lr=2.00e-03  30.44 seq/s  ETA 5.4 min
+  epoch 1/15  batch 100  seqs 1600/10607  running_loss=2.0676  lr=2.00e-03  31.82 seq/s  ETA 4.7 min
+  epoch 1/15  batch 150  seqs 2400/10607  running_loss=2.0400  lr=2.00e-03  32.19 seq/s  ETA 4.2 min
+  epoch 1/15  batch 200  seqs 3200/10607  running_loss=2.0549  lr=2.00e-03  32.42 seq/s  ETA 3.8 min
+  epoch 1/15  batch 250  seqs 4000/10607  running_loss=2.0216  lr=2.00e-03  32.29 seq/s  ETA 3.4 min
+  epoch 1/15  batch 300  seqs 4800/10607  running_loss=1.9978  lr=2.00e-03  32.27 seq/s  ETA 3.0 min
+  epoch 1/15  batch 350  seqs 5600/10607  running_loss=1.9701  lr=2.00e-03  32.42 seq/s  ETA 2.6 min
+  epoch 1/15  batch 400  seqs 6400/10607  running_loss=1.9671  lr=2.00e-03  32.56 seq/s  ETA 2.2 min
+  epoch 1/15  batch 450  seqs 7200/10607  running_loss=1.9567  lr=2.00e-03  32.55 seq/s  ETA 1.7 min
+  epoch 1/15  batch 500  seqs 8000/10607  running_loss=1.9525  lr=2.00e-03  32.44 seq/s  ETA 1.3 min
+  epoch 1/15  batch 550  seqs 8800/10607  running_loss=1.9411  lr=2.00e-03  32.46 seq/s  ETA 0.9 min
+  epoch 1/15  batch 600  seqs 9600/10607  running_loss=1.9378  lr=2.00e-03  32.50 seq/s  ETA 0.5 min
+  epoch 1/15  batch 650  seqs 10400/10607  running_loss=1.9307  lr=2.00e-03  32.53 seq/s  ETA 0.1 min
+epoch 1/15  train_loss=1.9291  val_loss=1.8078  val_corr_t0=0.3515  val_corr_t1=0.4515  *best*  (epoch 5.4 min, total 5.5 min)
+  epoch 2/15  batch 50  seqs 800/10607  running_loss=1.8586  lr=2.00e-03  32.96 seq/s  ETA 5.0 min
+  epoch 2/15  batch 100  seqs 1600/10607  running_loss=1.8618  lr=2.00e-03  33.11 seq/s  ETA 4.5 min
+  epoch 2/15  batch 150  seqs 2400/10607  running_loss=1.8737  lr=2.00e-03  32.62 seq/s  ETA 4.2 min
+  epoch 2/15  batch 200  seqs 3200/10607  running_loss=1.8684  lr=2.00e-03  32.21 seq/s  ETA 3.8 min
+  epoch 2/15  batch 250  seqs 4000/10607  running_loss=1.8734  lr=2.00e-03  31.43 seq/s  ETA 3.5 min
+  epoch 2/15  batch 300  seqs 4800/10607  running_loss=1.8773  lr=2.00e-03  31.59 seq/s  ETA 3.1 min
+  epoch 2/15  batch 350  seqs 5600/10607  running_loss=1.8771  lr=2.00e-03  31.74 seq/s  ETA 2.6 min
+  epoch 2/15  batch 400  seqs 6400/10607  running_loss=1.8635  lr=2.00e-03  31.68 seq/s  ETA 2.2 min
+  epoch 2/15  batch 450  seqs 7200/10607  running_loss=1.8792  lr=2.00e-03  31.73 seq/s  ETA 1.8 min
+  epoch 2/15  batch 500  seqs 8000/10607  running_loss=1.8801  lr=2.00e-03  31.86 seq/s  ETA 1.4 min
+  epoch 2/15  batch 550  seqs 8800/10607  running_loss=1.8784  lr=2.00e-03  31.83 seq/s  ETA 0.9 min
+  epoch 2/15  batch 600  seqs 9600/10607  running_loss=1.8756  lr=2.00e-03  31.65 seq/s  ETA 0.5 min
+  epoch 2/15  batch 650  seqs 10400/10607  running_loss=1.8737  lr=2.00e-03  31.64 seq/s  ETA 0.1 min
+epoch 2/15  train_loss=1.8711  val_loss=1.8227  val_corr_t0=0.3461  val_corr_t1=0.4478    (epoch 5.6 min, total 11.1 min)
+  epoch 3/15  batch 50  seqs 800/10607  running_loss=1.8265  lr=2.00e-03  31.46 seq/s  ETA 5.2 min
+  epoch 3/15  batch 100  seqs 1600/10607  running_loss=1.8444  lr=2.00e-03  31.79 seq/s  ETA 4.7 min
+  epoch 3/15  batch 150  seqs 2400/10607  running_loss=1.8390  lr=2.00e-03  31.57 seq/s  ETA 4.3 min
+  epoch 3/15  batch 200  seqs 3200/10607  running_loss=1.8358  lr=2.00e-03  31.41 seq/s  ETA 3.9 min
+  epoch 3/15  batch 250  seqs 4000/10607  running_loss=1.8444  lr=2.00e-03  31.16 seq/s  ETA 3.5 min
+  epoch 3/15  batch 300  seqs 4800/10607  running_loss=1.8320  lr=2.00e-03  30.89 seq/s  ETA 3.1 min
+  epoch 3/15  batch 350  seqs 5600/10607  running_loss=1.8373  lr=2.00e-03  30.73 seq/s  ETA 2.7 min
+  epoch 3/15  batch 400  seqs 6400/10607  running_loss=1.8328  lr=2.00e-03  30.37 seq/s  ETA 2.3 min
+  epoch 3/15  batch 450  seqs 7200/10607  running_loss=1.8336  lr=2.00e-03  30.23 seq/s  ETA 1.9 min
+  epoch 3/15  batch 500  seqs 8000/10607  running_loss=1.8385  lr=2.00e-03  30.20 seq/s  ETA 1.4 min
+  epoch 3/15  batch 550  seqs 8800/10607  running_loss=1.8587  lr=2.00e-03  30.21 seq/s  ETA 1.0 min
+  epoch 3/15  batch 600  seqs 9600/10607  running_loss=1.8602  lr=2.00e-03  30.05 seq/s  ETA 0.6 min
+  epoch 3/15  batch 650  seqs 10400/10607  running_loss=1.8561  lr=2.00e-03  30.11 seq/s  ETA 0.1 min
+epoch 3/15  train_loss=1.8557  val_loss=1.7406  val_corr_t0=0.3824  val_corr_t1=0.4580  *best*  (epoch 5.9 min, total 17.0 min)
+  epoch 4/15  batch 50  seqs 800/10607  running_loss=1.8036  lr=2.00e-03  32.18 seq/s  ETA 5.1 min
+  epoch 4/15  batch 100  seqs 1600/10607  running_loss=1.8265  lr=2.00e-03  31.95 seq/s  ETA 4.7 min
+  epoch 4/15  batch 150  seqs 2400/10607  running_loss=1.9040  lr=2.00e-03  30.81 seq/s  ETA 4.4 min
+  epoch 4/15  batch 200  seqs 3200/10607  running_loss=1.8986  lr=2.00e-03  30.67 seq/s  ETA 4.0 min
+  epoch 4/15  batch 250  seqs 4000/10607  running_loss=1.8884  lr=2.00e-03  30.59 seq/s  ETA 3.6 min
+  epoch 4/15  batch 300  seqs 4800/10607  running_loss=1.8799  lr=2.00e-03  30.47 seq/s  ETA 3.2 min
+  epoch 4/15  batch 350  seqs 5600/10607  running_loss=1.8765  lr=2.00e-03  29.61 seq/s  ETA 2.8 min
+  epoch 4/15  batch 400  seqs 6400/10607  running_loss=1.8657  lr=2.00e-03  29.52 seq/s  ETA 2.4 min
+  epoch 4/15  batch 450  seqs 7200/10607  running_loss=1.8595  lr=2.00e-03  29.44 seq/s  ETA 1.9 min
+  epoch 4/15  batch 500  seqs 8000/10607  running_loss=1.8548  lr=2.00e-03  29.28 seq/s  ETA 1.5 min
+  epoch 4/15  batch 550  seqs 8800/10607  running_loss=1.8513  lr=2.00e-03  29.18 seq/s  ETA 1.0 min
+  epoch 4/15  batch 600  seqs 9600/10607  running_loss=1.8480  lr=2.00e-03  29.08 seq/s  ETA 0.6 min
+  epoch 4/15  batch 650  seqs 10400/10607  running_loss=1.8452  lr=2.00e-03  29.00 seq/s  ETA 0.1 min
+epoch 4/15  train_loss=1.8442  val_loss=1.7840  val_corr_t0=0.3595  val_corr_t1=0.4606    (epoch 6.1 min, total 23.1 min)
+  epoch 5/15  batch 50  seqs 800/10607  running_loss=1.8097  lr=2.00e-03  27.67 seq/s  ETA 5.9 min
+  epoch 5/15  batch 100  seqs 1600/10607  running_loss=1.8034  lr=2.00e-03  27.94 seq/s  ETA 5.4 min
+  epoch 5/15  batch 150  seqs 2400/10607  running_loss=1.8009  lr=2.00e-03  28.60 seq/s  ETA 4.8 min
+  epoch 5/15  batch 200  seqs 3200/10607  running_loss=1.8054  lr=2.00e-03  28.77 seq/s  ETA 4.3 min
+  epoch 5/15  batch 250  seqs 4000/10607  running_loss=1.8010  lr=2.00e-03  28.38 seq/s  ETA 3.9 min
+  epoch 5/15  batch 300  seqs 4800/10607  running_loss=1.7979  lr=2.00e-03  28.67 seq/s  ETA 3.4 min
+  epoch 5/15  batch 350  seqs 5600/10607  running_loss=1.7982  lr=2.00e-03  28.91 seq/s  ETA 2.9 min
+  epoch 5/15  batch 400  seqs 6400/10607  running_loss=1.8101  lr=2.00e-03  29.06 seq/s  ETA 2.4 min
+  epoch 5/15  batch 450  seqs 7200/10607  running_loss=1.8285  lr=2.00e-03  29.24 seq/s  ETA 1.9 min
+  epoch 5/15  batch 500  seqs 8000/10607  running_loss=1.8254  lr=2.00e-03  29.31 seq/s  ETA 1.5 min
+  epoch 5/15  batch 550  seqs 8800/10607  running_loss=1.8310  lr=2.00e-03  29.39 seq/s  ETA 1.0 min
+  epoch 5/15  batch 600  seqs 9600/10607  running_loss=1.8388  lr=2.00e-03  29.54 seq/s  ETA 0.6 min
+  epoch 5/15  batch 650  seqs 10400/10607  running_loss=1.8394  lr=2.00e-03  29.74 seq/s  ETA 0.1 min
+epoch 5/15  train_loss=1.8386  val_loss=1.7678  val_corr_t0=0.3666  val_corr_t1=0.4705    (epoch 5.9 min, total 29.1 min)
+  epoch 6/15  batch 50  seqs 800/10607  running_loss=1.7976  lr=2.00e-03  30.90 seq/s  ETA 5.3 min
+  epoch 6/15  batch 100  seqs 1600/10607  running_loss=1.8360  lr=2.00e-03  31.67 seq/s  ETA 4.7 min
+  epoch 6/15  batch 150  seqs 2400/10607  running_loss=1.8324  lr=2.00e-03  31.47 seq/s  ETA 4.3 min
+  epoch 6/15  batch 200  seqs 3200/10607  running_loss=1.8347  lr=2.00e-03  31.33 seq/s  ETA 3.9 min
+  epoch 6/15  batch 250  seqs 4000/10607  running_loss=1.8251  lr=2.00e-03  30.30 seq/s  ETA 3.6 min
+  epoch 6/15  batch 300  seqs 4800/10607  running_loss=1.8213  lr=2.00e-03  29.40 seq/s  ETA 3.3 min
+  epoch 6/15  batch 350  seqs 5600/10607  running_loss=1.8265  lr=2.00e-03  29.28 seq/s  ETA 2.9 min
+  epoch 6/15  batch 400  seqs 6400/10607  running_loss=1.8242  lr=2.00e-03  29.09 seq/s  ETA 2.4 min
+  epoch 6/15  batch 450  seqs 7200/10607  running_loss=1.8396  lr=2.00e-03  29.19 seq/s  ETA 1.9 min
+  epoch 6/15  batch 500  seqs 8000/10607  running_loss=1.8385  lr=2.00e-03  29.14 seq/s  ETA 1.5 min
+  epoch 6/15  batch 550  seqs 8800/10607  running_loss=1.8324  lr=2.00e-03  28.95 seq/s  ETA 1.0 min
+  epoch 6/15  batch 600  seqs 9600/10607  running_loss=1.8352  lr=2.00e-03  28.96 seq/s  ETA 0.6 min
+  epoch 6/15  batch 650  seqs 10400/10607  running_loss=1.8324  lr=2.00e-03  29.02 seq/s  ETA 0.1 min
+epoch 6/15  train_loss=1.8327  val_loss=1.7508  val_corr_t0=0.3632  val_corr_t1=0.4744    (epoch 6.1 min, total 35.2 min)
+  epoch 7/15  batch 50  seqs 800/10607  running_loss=1.8111  lr=2.00e-03  29.09 seq/s  ETA 5.6 min
+  epoch 7/15  batch 100  seqs 1600/10607  running_loss=1.8382  lr=2.00e-03  28.35 seq/s  ETA 5.3 min
+  epoch 7/15  batch 150  seqs 2400/10607  running_loss=1.8465  lr=2.00e-03  28.47 seq/s  ETA 4.8 min
+  epoch 7/15  batch 200  seqs 3200/10607  running_loss=1.8384  lr=2.00e-03  28.48 seq/s  ETA 4.3 min
+  epoch 7/15  batch 250  seqs 4000/10607  running_loss=1.8240  lr=2.00e-03  28.57 seq/s  ETA 3.9 min
+  epoch 7/15  batch 300  seqs 4800/10607  running_loss=1.8450  lr=2.00e-03  28.42 seq/s  ETA 3.4 min
+  epoch 7/15  batch 350  seqs 5600/10607  running_loss=1.8443  lr=2.00e-03  28.42 seq/s  ETA 2.9 min
+  epoch 7/15  batch 400  seqs 6400/10607  running_loss=1.8312  lr=2.00e-03  28.31 seq/s  ETA 2.5 min
+  epoch 7/15  batch 450  seqs 7200/10607  running_loss=1.8296  lr=2.00e-03  28.12 seq/s  ETA 2.0 min
+  epoch 7/15  batch 500  seqs 8000/10607  running_loss=1.8254  lr=2.00e-03  28.20 seq/s  ETA 1.5 min
+  epoch 7/15  batch 550  seqs 8800/10607  running_loss=1.8263  lr=2.00e-03  28.20 seq/s  ETA 1.1 min
+  epoch 7/15  batch 600  seqs 9600/10607  running_loss=1.8292  lr=2.00e-03  28.16 seq/s  ETA 0.6 min
+  epoch 7/15  batch 650  seqs 10400/10607  running_loss=1.8258  lr=2.00e-03  28.18 seq/s  ETA 0.1 min
+epoch 7/15  train_loss=1.8274  val_loss=1.7631  val_corr_t0=0.3692  val_corr_t1=0.4866  *best*  (epoch 6.3 min, total 41.5 min)
+  epoch 8/15  batch 50  seqs 800/10607  running_loss=1.8527  lr=2.00e-03  28.52 seq/s  ETA 5.7 min
+  epoch 8/15  batch 100  seqs 1600/10607  running_loss=1.8126  lr=2.00e-03  29.04 seq/s  ETA 5.2 min
+  epoch 8/15  batch 150  seqs 2400/10607  running_loss=1.8264  lr=2.00e-03  29.58 seq/s  ETA 4.6 min
+  epoch 8/15  batch 200  seqs 3200/10607  running_loss=1.8284  lr=2.00e-03  29.83 seq/s  ETA 4.1 min
+  epoch 8/15  batch 250  seqs 4000/10607  running_loss=1.8209  lr=2.00e-03  29.69 seq/s  ETA 3.7 min
+  epoch 8/15  batch 300  seqs 4800/10607  running_loss=1.8290  lr=2.00e-03  29.48 seq/s  ETA 3.3 min
+  epoch 8/15  batch 350  seqs 5600/10607  running_loss=1.8226  lr=2.00e-03  29.53 seq/s  ETA 2.8 min
+  epoch 8/15  batch 400  seqs 6400/10607  running_loss=1.8211  lr=2.00e-03  29.32 seq/s  ETA 2.4 min
+  epoch 8/15  batch 450  seqs 7200/10607  running_loss=1.8195  lr=2.00e-03  29.26 seq/s  ETA 1.9 min
+  epoch 8/15  batch 500  seqs 8000/10607  running_loss=1.8193  lr=2.00e-03  29.14 seq/s  ETA 1.5 min
+  epoch 8/15  batch 550  seqs 8800/10607  running_loss=1.8135  lr=2.00e-03  29.10 seq/s  ETA 1.0 min
+  epoch 8/15  batch 600  seqs 9600/10607  running_loss=1.8138  lr=2.00e-03  29.18 seq/s  ETA 0.6 min
+  epoch 8/15  batch 650  seqs 10400/10607  running_loss=1.8244  lr=2.00e-03  29.16 seq/s  ETA 0.1 min
+epoch 8/15  train_loss=1.8251  val_loss=1.7293  val_corr_t0=0.3595  val_corr_t1=0.4845    (epoch 6.1 min, total 47.5 min)
+  epoch 9/15  batch 50  seqs 800/10607  running_loss=1.8492  lr=1.90e-03  27.78 seq/s  ETA 5.9 min
+  epoch 9/15  batch 100  seqs 1600/10607  running_loss=1.8232  lr=1.90e-03  27.32 seq/s  ETA 5.5 min
+  epoch 9/15  batch 150  seqs 2400/10607  running_loss=1.7947  lr=1.90e-03  27.85 seq/s  ETA 4.9 min
+  epoch 9/15  batch 200  seqs 3200/10607  running_loss=1.8103  lr=1.90e-03  27.43 seq/s  ETA 4.5 min
+  epoch 9/15  batch 250  seqs 4000/10607  running_loss=1.8162  lr=1.90e-03  27.47 seq/s  ETA 4.0 min
+  epoch 9/15  batch 300  seqs 4800/10607  running_loss=1.8162  lr=1.90e-03  27.51 seq/s  ETA 3.5 min
+  epoch 9/15  batch 350  seqs 5600/10607  running_loss=1.8119  lr=1.90e-03  27.06 seq/s  ETA 3.1 min
+  epoch 9/15  batch 400  seqs 6400/10607  running_loss=1.8067  lr=1.90e-03  26.67 seq/s  ETA 2.6 min
+  epoch 9/15  batch 450  seqs 7200/10607  running_loss=1.8269  lr=1.90e-03  26.70 seq/s  ETA 2.1 min
+  epoch 9/15  batch 500  seqs 8000/10607  running_loss=1.8215  lr=1.90e-03  26.95 seq/s  ETA 1.6 min
+  epoch 9/15  batch 550  seqs 8800/10607  running_loss=1.8227  lr=1.90e-03  26.84 seq/s  ETA 1.1 min
+  epoch 9/15  batch 600  seqs 9600/10607  running_loss=1.8226  lr=1.90e-03  27.05 seq/s  ETA 0.6 min
+  epoch 9/15  batch 650  seqs 10400/10607  running_loss=1.8216  lr=1.90e-03  27.29 seq/s  ETA 0.1 min
+epoch 9/15  train_loss=1.8207  val_loss=1.7530  val_corr_t0=0.3498  val_corr_t1=0.4807    (epoch 6.5 min, total 54.0 min)
+  epoch 10/15  batch 50  seqs 800/10607  running_loss=1.7607  lr=1.62e-03  29.53 seq/s  ETA 5.5 min
+  epoch 10/15  batch 100  seqs 1600/10607  running_loss=1.8227  lr=1.62e-03  29.81 seq/s  ETA 5.0 min
+  epoch 10/15  batch 150  seqs 2400/10607  running_loss=1.7964  lr=1.62e-03  29.40 seq/s  ETA 4.7 min
+  epoch 10/15  batch 200  seqs 3200/10607  running_loss=1.7899  lr=1.62e-03  29.59 seq/s  ETA 4.2 min
+  epoch 10/15  batch 250  seqs 4000/10607  running_loss=1.8051  lr=1.62e-03  29.76 seq/s  ETA 3.7 min
+  epoch 10/15  batch 300  seqs 4800/10607  running_loss=1.8042  lr=1.62e-03  29.77 seq/s  ETA 3.3 min
+  epoch 10/15  batch 350  seqs 5600/10607  running_loss=1.7970  lr=1.62e-03  29.65 seq/s  ETA 2.8 min
+  epoch 10/15  batch 400  seqs 6400/10607  running_loss=1.8019  lr=1.62e-03  29.67 seq/s  ETA 2.4 min
+  epoch 10/15  batch 450  seqs 7200/10607  running_loss=1.8047  lr=1.62e-03  29.73 seq/s  ETA 1.9 min
+  epoch 10/15  batch 500  seqs 8000/10607  running_loss=1.8041  lr=1.62e-03  29.78 seq/s  ETA 1.5 min
+  epoch 10/15  batch 550  seqs 8800/10607  running_loss=1.8003  lr=1.62e-03  29.77 seq/s  ETA 1.0 min
+  epoch 10/15  batch 600  seqs 9600/10607  running_loss=1.8011  lr=1.62e-03  29.61 seq/s  ETA 0.6 min
+  epoch 10/15  batch 650  seqs 10400/10607  running_loss=1.8145  lr=1.62e-03  29.47 seq/s  ETA 0.1 min
+epoch 10/15  train_loss=1.8143  val_loss=1.7148  val_corr_t0=0.3603  val_corr_t1=0.4923    (epoch 6.0 min, total 60.1 min)
+  epoch 11/15  batch 50  seqs 800/10607  running_loss=1.7535  lr=1.22e-03  27.85 seq/s  ETA 5.9 min
+  epoch 11/15  batch 100  seqs 1600/10607  running_loss=1.7830  lr=1.22e-03  27.57 seq/s  ETA 5.4 min
+  epoch 11/15  batch 150  seqs 2400/10607  running_loss=1.8438  lr=1.22e-03  28.16 seq/s  ETA 4.9 min
+  epoch 11/15  batch 200  seqs 3200/10607  running_loss=1.8388  lr=1.22e-03  28.28 seq/s  ETA 4.4 min
+  epoch 11/15  batch 250  seqs 4000/10607  running_loss=1.8293  lr=1.22e-03  28.28 seq/s  ETA 3.9 min
+  epoch 11/15  batch 300  seqs 4800/10607  running_loss=1.8194  lr=1.22e-03  28.69 seq/s  ETA 3.4 min
+  epoch 11/15  batch 350  seqs 5600/10607  running_loss=1.8149  lr=1.22e-03  28.85 seq/s  ETA 2.9 min
+  epoch 11/15  batch 400  seqs 6400/10607  running_loss=1.8157  lr=1.22e-03  28.78 seq/s  ETA 2.4 min
+  epoch 11/15  batch 450  seqs 7200/10607  running_loss=1.8100  lr=1.22e-03  28.67 seq/s  ETA 2.0 min
+  epoch 11/15  batch 500  seqs 8000/10607  running_loss=1.8050  lr=1.22e-03  28.75 seq/s  ETA 1.5 min
+  epoch 11/15  batch 550  seqs 8800/10607  running_loss=1.8072  lr=1.22e-03  28.94 seq/s  ETA 1.0 min
+  epoch 11/15  batch 600  seqs 9600/10607  running_loss=1.8046  lr=1.22e-03  28.93 seq/s  ETA 0.6 min
+  epoch 11/15  batch 650  seqs 10400/10607  running_loss=1.8051  lr=1.22e-03  28.84 seq/s  ETA 0.1 min
+epoch 11/15  train_loss=1.8066  val_loss=1.7323  val_corr_t0=0.3565  val_corr_t1=0.4949    (epoch 6.1 min, total 66.2 min)
+  epoch 12/15  batch 50  seqs 800/10607  running_loss=1.7291  lr=7.77e-04  24.45 seq/s  ETA 6.7 min
+  epoch 12/15  batch 100  seqs 1600/10607  running_loss=1.7276  lr=7.77e-04  23.00 seq/s  ETA 6.5 min
+  epoch 12/15  batch 150  seqs 2400/10607  running_loss=1.7608  lr=7.77e-04  22.82 seq/s  ETA 6.0 min
+  epoch 12/15  batch 200  seqs 3200/10607  running_loss=1.7639  lr=7.77e-04  22.78 seq/s  ETA 5.4 min
+  epoch 12/15  batch 250  seqs 4000/10607  running_loss=1.7784  lr=7.77e-04  22.94 seq/s  ETA 4.8 min
+  epoch 12/15  batch 300  seqs 4800/10607  running_loss=1.7794  lr=7.77e-04  23.07 seq/s  ETA 4.2 min
+  epoch 12/15  batch 350  seqs 5600/10607  running_loss=1.7843  lr=7.77e-04  23.30 seq/s  ETA 3.6 min
+  epoch 12/15  batch 400  seqs 6400/10607  running_loss=1.7905  lr=7.77e-04  23.60 seq/s  ETA 3.0 min
+  epoch 12/15  batch 450  seqs 7200/10607  running_loss=1.7909  lr=7.77e-04  23.84 seq/s  ETA 2.4 min
+  epoch 12/15  batch 500  seqs 8000/10607  running_loss=1.8066  lr=7.77e-04  24.40 seq/s  ETA 1.8 min
+  epoch 12/15  batch 550  seqs 8800/10607  running_loss=1.8070  lr=7.77e-04  24.90 seq/s  ETA 1.2 min
+  epoch 12/15  batch 600  seqs 9600/10607  running_loss=1.8027  lr=7.77e-04  25.27 seq/s  ETA 0.7 min
+  epoch 12/15  batch 650  seqs 10400/10607  running_loss=1.7977  lr=7.77e-04  25.62 seq/s  ETA 0.1 min
+epoch 12/15  train_loss=1.7979  val_loss=1.7640  val_corr_t0=0.3530  val_corr_t1=0.4675    (epoch 6.9 min, total 73.1 min)
+  epoch 13/15  batch 50  seqs 800/10607  running_loss=1.7114  lr=3.77e-04  28.98 seq/s  ETA 5.6 min
+  epoch 13/15  batch 100  seqs 1600/10607  running_loss=1.7092  lr=3.77e-04  29.90 seq/s  ETA 5.0 min
+  epoch 13/15  batch 150  seqs 2400/10607  running_loss=1.7456  lr=3.77e-04  28.71 seq/s  ETA 4.8 min
+  epoch 13/15  batch 200  seqs 3200/10607  running_loss=1.7506  lr=3.77e-04  28.31 seq/s  ETA 4.4 min
+  epoch 13/15  batch 250  seqs 4000/10607  running_loss=1.7437  lr=3.77e-04  28.20 seq/s  ETA 3.9 min
+  epoch 13/15  batch 300  seqs 4800/10607  running_loss=1.7572  lr=3.77e-04  28.34 seq/s  ETA 3.4 min
+  epoch 13/15  batch 350  seqs 5600/10607  running_loss=1.7648  lr=3.77e-04  28.26 seq/s  ETA 3.0 min
+  epoch 13/15  batch 400  seqs 6400/10607  running_loss=1.7661  lr=3.77e-04  28.27 seq/s  ETA 2.5 min
+  epoch 13/15  batch 450  seqs 7200/10607  running_loss=1.7688  lr=3.77e-04  28.11 seq/s  ETA 2.0 min
+  epoch 13/15  batch 500  seqs 8000/10607  running_loss=1.7877  lr=3.77e-04  27.73 seq/s  ETA 1.6 min
+  epoch 13/15  batch 550  seqs 8800/10607  running_loss=1.7878  lr=3.77e-04  27.65 seq/s  ETA 1.1 min
+  epoch 13/15  batch 600  seqs 9600/10607  running_loss=1.7885  lr=3.77e-04  27.72 seq/s  ETA 0.6 min
+  epoch 13/15  batch 650  seqs 10400/10607  running_loss=1.7888  lr=3.77e-04  27.49 seq/s  ETA 0.1 min
+epoch 13/15  train_loss=1.7892  val_loss=1.7356  val_corr_t0=0.3614  val_corr_t1=0.4874    (epoch 6.4 min, total 79.6 min)
+  epoch 14/15  batch 50  seqs 800/10607  running_loss=1.7996  lr=9.90e-05  26.11 seq/s  ETA 6.3 min
+  epoch 14/15  batch 100  seqs 1600/10607  running_loss=1.8061  lr=9.90e-05  25.64 seq/s  ETA 5.9 min
+  epoch 14/15  batch 150  seqs 2400/10607  running_loss=1.7599  lr=9.90e-05  26.31 seq/s  ETA 5.2 min
+  epoch 14/15  batch 200  seqs 3200/10607  running_loss=1.7520  lr=9.90e-05  26.55 seq/s  ETA 4.7 min
+  epoch 14/15  batch 250  seqs 4000/10607  running_loss=1.7529  lr=9.90e-05  26.53 seq/s  ETA 4.2 min
+  epoch 14/15  batch 300  seqs 4800/10607  running_loss=1.7496  lr=9.90e-05  26.57 seq/s  ETA 3.6 min
+  epoch 14/15  batch 350  seqs 5600/10607  running_loss=1.7507  lr=9.90e-05  27.07 seq/s  ETA 3.1 min
+  epoch 14/15  batch 400  seqs 6400/10607  running_loss=1.7560  lr=9.90e-05  27.51 seq/s  ETA 2.5 min
+  epoch 14/15  batch 450  seqs 7200/10607  running_loss=1.7712  lr=9.90e-05  27.88 seq/s  ETA 2.0 min
+  epoch 14/15  batch 500  seqs 8000/10607  running_loss=1.7773  lr=9.90e-05  27.94 seq/s  ETA 1.6 min
+  epoch 14/15  batch 550  seqs 8800/10607  running_loss=1.7794  lr=9.90e-05  27.71 seq/s  ETA 1.1 min
+  epoch 14/15  batch 600  seqs 9600/10607  running_loss=1.7801  lr=9.90e-05  27.60 seq/s  ETA 0.6 min
+  epoch 14/15  batch 650  seqs 10400/10607  running_loss=1.7820  lr=9.90e-05  27.59 seq/s  ETA 0.1 min
+epoch 14/15  train_loss=1.7823  val_loss=1.7575  val_corr_t0=0.3518  val_corr_t1=0.4801    (epoch 6.4 min, total 86.1 min)
+  epoch 15/15  batch 50  seqs 800/10607  running_loss=1.7561  lr=0.00e+00  26.31 seq/s  ETA 6.2 min
+  epoch 15/15  batch 100  seqs 1600/10607  running_loss=1.7622  lr=0.00e+00  27.28 seq/s  ETA 5.5 min
+  epoch 15/15  batch 150  seqs 2400/10607  running_loss=1.7824  lr=0.00e+00  27.24 seq/s  ETA 5.0 min
+  epoch 15/15  batch 200  seqs 3200/10607  running_loss=1.8138  lr=0.00e+00  27.27 seq/s  ETA 4.5 min
+  epoch 15/15  batch 250  seqs 4000/10607  running_loss=1.8089  lr=0.00e+00  27.30 seq/s  ETA 4.0 min
+  epoch 15/15  batch 300  seqs 4800/10607  running_loss=1.8018  lr=0.00e+00  27.36 seq/s  ETA 3.5 min
+  epoch 15/15  batch 350  seqs 5600/10607  running_loss=1.8006  lr=0.00e+00  27.45 seq/s  ETA 3.0 min
+  epoch 15/15  batch 400  seqs 6400/10607  running_loss=1.7957  lr=0.00e+00  27.51 seq/s  ETA 2.5 min
+  epoch 15/15  batch 450  seqs 7200/10607  running_loss=1.7930  lr=0.00e+00  27.47 seq/s  ETA 2.1 min
+  epoch 15/15  batch 500  seqs 8000/10607  running_loss=1.7897  lr=0.00e+00  27.22 seq/s  ETA 1.6 min
+  epoch 15/15  batch 550  seqs 8800/10607  running_loss=1.7852  lr=0.00e+00  27.19 seq/s  ETA 1.1 min
+  epoch 15/15  batch 600  seqs 9600/10607  running_loss=1.7817  lr=0.00e+00  27.23 seq/s  ETA 0.6 min
+  epoch 15/15  batch 650  seqs 10400/10607  running_loss=1.7792  lr=0.00e+00  27.15 seq/s  ETA 0.1 min
+epoch 15/15  train_loss=1.7801  val_loss=1.7575  val_corr_t0=0.3518  val_corr_t1=0.4801    (epoch 6.5 min, total 92.6 min)
+
+done. best val score (mean corr) = 0.4279
+best checkpoint: /Users/mingda/Desktop/wunderfund/wunderfund/experiment_1_training/runs/tcn_experiment1_7_best.pt
+latest checkpoint: /Users/mingda/Desktop/wunderfund/wunderfund/experiment_1_training/runs/tcn_experiment1_7_latest.pt
+
+next step: run extract_numpy_weights.py to convert the checkpoint into the pure-numpy format solution.py expects (see model_training.md).
+
+=== run start 2026-09-28 15:34:44 — 20 train seqs, 1873 valid seqs, 15 epochs remaining — loss=wp_aligned, layers=7, lr_flat_epochs=8 ===
+epoch 1/15  train_loss=3.1932  val_loss=3.8325  val_corr_t0=-0.0845  val_corr_t1=0.1401  *best*  (epoch 0.0 min, total 0.6 min)
+
+interrupted — latest checkpoint is already saved after the last completed epoch (re-run with RESUME_FROM = '/Users/mingda/Desktop/wunderfund/wunderfund/experiment_1_training/runs/tcn_experiment1_7_latest.pt' to continue)
+
+=== run start 2026-09-28 15:36:11 — 10607 train seqs, 1873 valid seqs, 15 epochs remaining — loss=wp_aligned, layers=7, lr_flat_epochs=8 ===
+  epoch 1/15  batch 50  seqs 800/10607  running_loss=2.3017  lr=2.00e-03  30.55 seq/s  ETA 5.4 min
+  epoch 1/15  batch 100  seqs 1600/10607  running_loss=2.1151  lr=2.00e-03  31.26 seq/s  ETA 4.8 min
+  epoch 1/15  batch 150  seqs 2400/10607  running_loss=2.0729  lr=2.00e-03  31.41 seq/s  ETA 4.4 min
+  epoch 1/15  batch 200  seqs 3200/10607  running_loss=2.0771  lr=2.00e-03  31.68 seq/s  ETA 3.9 min
+  epoch 1/15  batch 250  seqs 4000/10607  running_loss=2.0395  lr=2.00e-03  31.79 seq/s  ETA 3.5 min
+  epoch 1/15  batch 300  seqs 4800/10607  running_loss=2.0125  lr=2.00e-03  31.80 seq/s  ETA 3.0 min
+  epoch 1/15  batch 350  seqs 5600/10607  running_loss=1.9827  lr=2.00e-03  31.79 seq/s  ETA 2.6 min
+  epoch 1/15  batch 400  seqs 6400/10607  running_loss=1.9781  lr=2.00e-03  31.87 seq/s  ETA 2.2 min
+  epoch 1/15  batch 450  seqs 7200/10607  running_loss=1.9668  lr=2.00e-03  31.79 seq/s  ETA 1.8 min
+  epoch 1/15  batch 500  seqs 8000/10607  running_loss=1.9613  lr=2.00e-03  31.77 seq/s  ETA 1.4 min
+  epoch 1/15  batch 550  seqs 8800/10607  running_loss=1.9492  lr=2.00e-03  31.31 seq/s  ETA 1.0 min
+  epoch 1/15  batch 600  seqs 9600/10607  running_loss=1.9453  lr=2.00e-03  30.92 seq/s  ETA 0.5 min
+  epoch 1/15  batch 650  seqs 10400/10607  running_loss=1.9374  lr=2.00e-03  30.73 seq/s  ETA 0.1 min
+epoch 1/15  train_loss=1.9355  val_loss=1.5574  val_corr_t0=0.3639  val_corr_t1=0.3759  *best*  (epoch 5.8 min, total 6.4 min)
+  epoch 2/15  batch 50  seqs 800/10607  running_loss=1.8547  lr=2.00e-03  29.55 seq/s  ETA 5.5 min
+  epoch 2/15  batch 100  seqs 1600/10607  running_loss=1.8601  lr=2.00e-03  29.08 seq/s  ETA 5.2 min
+  epoch 2/15  batch 150  seqs 2400/10607  running_loss=1.8727  lr=2.00e-03  29.16 seq/s  ETA 4.7 min
+  epoch 2/15  batch 200  seqs 3200/10607  running_loss=1.8670  lr=2.00e-03  29.45 seq/s  ETA 4.2 min
+  epoch 2/15  batch 250  seqs 4000/10607  running_loss=1.8722  lr=2.00e-03  29.26 seq/s  ETA 3.8 min
+  epoch 2/15  batch 300  seqs 4800/10607  running_loss=1.8765  lr=2.00e-03  29.26 seq/s  ETA 3.3 min
+  epoch 2/15  batch 350  seqs 5600/10607  running_loss=1.8763  lr=2.00e-03  29.15 seq/s  ETA 2.9 min
+  epoch 2/15  batch 400  seqs 6400/10607  running_loss=1.8628  lr=2.00e-03  29.13 seq/s  ETA 2.4 min
+  epoch 2/15  batch 450  seqs 7200/10607  running_loss=1.8782  lr=2.00e-03  29.16 seq/s  ETA 1.9 min
+  epoch 2/15  batch 500  seqs 8000/10607  running_loss=1.8791  lr=2.00e-03  28.93 seq/s  ETA 1.5 min
+  epoch 2/15  batch 550  seqs 8800/10607  running_loss=1.8774  lr=2.00e-03  28.61 seq/s  ETA 1.1 min
+  epoch 2/15  batch 600  seqs 9600/10607  running_loss=1.8748  lr=2.00e-03  28.53 seq/s  ETA 0.6 min
+  epoch 2/15  batch 650  seqs 10400/10607  running_loss=1.8728  lr=2.00e-03  28.54 seq/s  ETA 0.1 min
+epoch 2/15  train_loss=1.8702  val_loss=1.5545  val_corr_t0=0.3671  val_corr_t1=0.3779  *best*  (epoch 6.2 min, total 13.2 min)
+  epoch 3/15  batch 50  seqs 800/10607  running_loss=1.8253  lr=2.00e-03  26.65 seq/s  ETA 6.1 min
+  epoch 3/15  batch 100  seqs 1600/10607  running_loss=1.8436  lr=2.00e-03  27.98 seq/s  ETA 5.4 min
+  epoch 3/15  batch 150  seqs 2400/10607  running_loss=1.8384  lr=2.00e-03  29.02 seq/s  ETA 4.7 min
+  epoch 3/15  batch 200  seqs 3200/10607  running_loss=1.8359  lr=2.00e-03  29.69 seq/s  ETA 4.2 min
+  epoch 3/15  batch 250  seqs 4000/10607  running_loss=1.8447  lr=2.00e-03  30.13 seq/s  ETA 3.7 min
+  epoch 3/15  batch 300  seqs 4800/10607  running_loss=1.8322  lr=2.00e-03  30.43 seq/s  ETA 3.2 min
+  epoch 3/15  batch 350  seqs 5600/10607  running_loss=1.8378  lr=2.00e-03  30.59 seq/s  ETA 2.7 min
+  epoch 3/15  batch 400  seqs 6400/10607  running_loss=1.8333  lr=2.00e-03  30.71 seq/s  ETA 2.3 min
+  epoch 3/15  batch 450  seqs 7200/10607  running_loss=1.8340  lr=2.00e-03  30.82 seq/s  ETA 1.8 min
+  epoch 3/15  batch 500  seqs 8000/10607  running_loss=1.8386  lr=2.00e-03  30.95 seq/s  ETA 1.4 min
+  epoch 3/15  batch 550  seqs 8800/10607  running_loss=1.8583  lr=2.00e-03  30.92 seq/s  ETA 1.0 min
+  epoch 3/15  batch 600  seqs 9600/10607  running_loss=1.8598  lr=2.00e-03  30.78 seq/s  ETA 0.5 min
+  epoch 3/15  batch 650  seqs 10400/10607  running_loss=1.8555  lr=2.00e-03  30.62 seq/s  ETA 0.1 min
+epoch 3/15  train_loss=1.8552  val_loss=1.5362  val_corr_t0=0.3815  val_corr_t1=0.3795  *best*  (epoch 5.8 min, total 19.6 min)
+  epoch 4/15  batch 50  seqs 800/10607  running_loss=1.8044  lr=2.00e-03  27.84 seq/s  ETA 5.9 min
+  epoch 4/15  batch 100  seqs 1600/10607  running_loss=1.8254  lr=2.00e-03  28.32 seq/s  ETA 5.3 min
+  epoch 4/15  batch 150  seqs 2400/10607  running_loss=1.9006  lr=2.00e-03  27.63 seq/s  ETA 4.9 min
+  epoch 4/15  batch 200  seqs 3200/10607  running_loss=1.8962  lr=2.00e-03  27.26 seq/s  ETA 4.5 min
+  epoch 4/15  batch 250  seqs 4000/10607  running_loss=1.8866  lr=2.00e-03  26.00 seq/s  ETA 4.2 min
+  epoch 4/15  batch 300  seqs 4800/10607  running_loss=1.8778  lr=2.00e-03  26.05 seq/s  ETA 3.7 min
+  epoch 4/15  batch 350  seqs 5600/10607  running_loss=1.8748  lr=2.00e-03  25.93 seq/s  ETA 3.2 min
+  epoch 4/15  batch 400  seqs 6400/10607  running_loss=1.8643  lr=2.00e-03  25.60 seq/s  ETA 2.7 min
+  epoch 4/15  batch 450  seqs 7200/10607  running_loss=1.8585  lr=2.00e-03  25.55 seq/s  ETA 2.2 min
+  epoch 4/15  batch 500  seqs 8000/10607  running_loss=1.8537  lr=2.00e-03  25.46 seq/s  ETA 1.7 min
+  epoch 4/15  batch 550  seqs 8800/10607  running_loss=1.8504  lr=2.00e-03  25.31 seq/s  ETA 1.2 min
+  epoch 4/15  batch 600  seqs 9600/10607  running_loss=1.8471  lr=2.00e-03  25.14 seq/s  ETA 0.7 min
+  epoch 4/15  batch 650  seqs 10400/10607  running_loss=1.8444  lr=2.00e-03  25.08 seq/s  ETA 0.1 min
+epoch 4/15  train_loss=1.8435  val_loss=1.5358  val_corr_t0=0.3820  val_corr_t1=0.3844  *best*  (epoch 7.0 min, total 27.4 min)
+  epoch 5/15  batch 50  seqs 800/10607  running_loss=1.8088  lr=2.00e-03  23.11 seq/s  ETA 7.1 min
+  epoch 5/15  batch 100  seqs 1600/10607  running_loss=1.8021  lr=2.00e-03  23.02 seq/s  ETA 6.5 min
+  epoch 5/15  batch 150  seqs 2400/10607  running_loss=1.7996  lr=2.00e-03  23.18 seq/s  ETA 5.9 min
+  epoch 5/15  batch 200  seqs 3200/10607  running_loss=1.8042  lr=2.00e-03  23.27 seq/s  ETA 5.3 min
+  epoch 5/15  batch 250  seqs 4000/10607  running_loss=1.8001  lr=2.00e-03  23.49 seq/s  ETA 4.7 min
+  epoch 5/15  batch 300  seqs 4800/10607  running_loss=1.7971  lr=2.00e-03  23.82 seq/s  ETA 4.1 min
+  epoch 5/15  batch 350  seqs 5600/10607  running_loss=1.7974  lr=2.00e-03  24.61 seq/s  ETA 3.4 min
+  epoch 5/15  batch 400  seqs 6400/10607  running_loss=1.8094  lr=2.00e-03  25.03 seq/s  ETA 2.8 min
+  epoch 5/15  batch 450  seqs 7200/10607  running_loss=1.8275  lr=2.00e-03  24.93 seq/s  ETA 2.3 min
+  epoch 5/15  batch 500  seqs 8000/10607  running_loss=1.8246  lr=2.00e-03  24.94 seq/s  ETA 1.7 min
+  epoch 5/15  batch 550  seqs 8800/10607  running_loss=1.8301  lr=2.00e-03  24.92 seq/s  ETA 1.2 min
+  epoch 5/15  batch 600  seqs 9600/10607  running_loss=1.8380  lr=2.00e-03  24.90 seq/s  ETA 0.7 min
+  epoch 5/15  batch 650  seqs 10400/10607  running_loss=1.8384  lr=2.00e-03  24.99 seq/s  ETA 0.1 min
+epoch 5/15  train_loss=1.8377  val_loss=1.5349  val_corr_t0=0.3790  val_corr_t1=0.3837    (epoch 7.1 min, total 35.1 min)
+  epoch 6/15  batch 50  seqs 800/10607  running_loss=1.7983  lr=2.00e-03  30.92 seq/s  ETA 5.3 min
+  epoch 6/15  batch 100  seqs 1600/10607  running_loss=1.8370  lr=2.00e-03  28.58 seq/s  ETA 5.3 min
+  epoch 6/15  batch 150  seqs 2400/10607  running_loss=1.8334  lr=2.00e-03  27.39 seq/s  ETA 5.0 min
+  epoch 6/15  batch 200  seqs 3200/10607  running_loss=1.8355  lr=2.00e-03  26.96 seq/s  ETA 4.6 min
+  epoch 6/15  batch 250  seqs 4000/10607  running_loss=1.8255  lr=2.00e-03  27.21 seq/s  ETA 4.0 min
+  epoch 6/15  batch 300  seqs 4800/10607  running_loss=1.8213  lr=2.00e-03  27.30 seq/s  ETA 3.5 min
+  epoch 6/15  batch 350  seqs 5600/10607  running_loss=1.8270  lr=2.00e-03  27.59 seq/s  ETA 3.0 min
+  epoch 6/15  batch 400  seqs 6400/10607  running_loss=1.8246  lr=2.00e-03  27.94 seq/s  ETA 2.5 min
+  epoch 6/15  batch 450  seqs 7200/10607  running_loss=1.8393  lr=2.00e-03  28.08 seq/s  ETA 2.0 min
+  epoch 6/15  batch 500  seqs 8000/10607  running_loss=1.8382  lr=2.00e-03  28.18 seq/s  ETA 1.5 min
+  epoch 6/15  batch 550  seqs 8800/10607  running_loss=1.8319  lr=2.00e-03  28.13 seq/s  ETA 1.1 min
+  epoch 6/15  batch 600  seqs 9600/10607  running_loss=1.8345  lr=2.00e-03  28.26 seq/s  ETA 0.6 min
+  epoch 6/15  batch 650  seqs 10400/10607  running_loss=1.8318  lr=2.00e-03  28.21 seq/s  ETA 0.1 min
+epoch 6/15  train_loss=1.8321  val_loss=1.5215  val_corr_t0=0.3811  val_corr_t1=0.3893  *best*  (epoch 6.3 min, total 42.1 min)
+  epoch 7/15  batch 50  seqs 800/10607  running_loss=1.8085  lr=2.00e-03  27.07 seq/s  ETA 6.0 min
+  epoch 7/15  batch 100  seqs 1600/10607  running_loss=1.8362  lr=2.00e-03  27.06 seq/s  ETA 5.5 min
+  epoch 7/15  batch 150  seqs 2400/10607  running_loss=1.8460  lr=2.00e-03  26.60 seq/s  ETA 5.1 min
+  epoch 7/15  batch 200  seqs 3200/10607  running_loss=1.8375  lr=2.00e-03  26.95 seq/s  ETA 4.6 min
+  epoch 7/15  batch 250  seqs 4000/10607  running_loss=1.8232  lr=2.00e-03  27.40 seq/s  ETA 4.0 min
+  epoch 7/15  batch 300  seqs 4800/10607  running_loss=1.8437  lr=2.00e-03  27.71 seq/s  ETA 3.5 min
+  epoch 7/15  batch 350  seqs 5600/10607  running_loss=1.8433  lr=2.00e-03  27.75 seq/s  ETA 3.0 min
+  epoch 7/15  batch 400  seqs 6400/10607  running_loss=1.8303  lr=2.00e-03  28.04 seq/s  ETA 2.5 min
+  epoch 7/15  batch 450  seqs 7200/10607  running_loss=1.8288  lr=2.00e-03  28.23 seq/s  ETA 2.0 min
+  epoch 7/15  batch 500  seqs 8000/10607  running_loss=1.8245  lr=2.00e-03  27.85 seq/s  ETA 1.6 min
+  epoch 7/15  batch 550  seqs 8800/10607  running_loss=1.8255  lr=2.00e-03  27.85 seq/s  ETA 1.1 min
+  epoch 7/15  batch 600  seqs 9600/10607  running_loss=1.8285  lr=2.00e-03  27.80 seq/s  ETA 0.6 min
+  epoch 7/15  batch 650  seqs 10400/10607  running_loss=1.8250  lr=2.00e-03  27.83 seq/s  ETA 0.1 min
+epoch 7/15  train_loss=1.8267  val_loss=1.5285  val_corr_t0=0.3874  val_corr_t1=0.3953  *best*  (epoch 6.4 min, total 49.0 min)
+  epoch 8/15  batch 50  seqs 800/10607  running_loss=1.8523  lr=2.00e-03  28.05 seq/s  ETA 5.8 min
+  epoch 8/15  batch 100  seqs 1600/10607  running_loss=1.8118  lr=2.00e-03  27.70 seq/s  ETA 5.4 min
+  epoch 8/15  batch 150  seqs 2400/10607  running_loss=1.8246  lr=2.00e-03  27.67 seq/s  ETA 4.9 min
+  epoch 8/15  batch 200  seqs 3200/10607  running_loss=1.8270  lr=2.00e-03  27.88 seq/s  ETA 4.4 min
+  epoch 8/15  batch 250  seqs 4000/10607  running_loss=1.8194  lr=2.00e-03  27.95 seq/s  ETA 3.9 min
+  epoch 8/15  batch 300  seqs 4800/10607  running_loss=1.8277  lr=2.00e-03  28.01 seq/s  ETA 3.5 min
+  epoch 8/15  batch 350  seqs 5600/10607  running_loss=1.8214  lr=2.00e-03  27.93 seq/s  ETA 3.0 min
+  epoch 8/15  batch 400  seqs 6400/10607  running_loss=1.8201  lr=2.00e-03  27.81 seq/s  ETA 2.5 min
+  epoch 8/15  batch 450  seqs 7200/10607  running_loss=1.8187  lr=2.00e-03  27.71 seq/s  ETA 2.0 min
+  epoch 8/15  batch 500  seqs 8000/10607  running_loss=1.8186  lr=2.00e-03  27.85 seq/s  ETA 1.6 min
+  epoch 8/15  batch 550  seqs 8800/10607  running_loss=1.8129  lr=2.00e-03  28.02 seq/s  ETA 1.1 min
+  epoch 8/15  batch 600  seqs 9600/10607  running_loss=1.8134  lr=2.00e-03  28.02 seq/s  ETA 0.6 min
+  epoch 8/15  batch 650  seqs 10400/10607  running_loss=1.8232  lr=2.00e-03  28.15 seq/s  ETA 0.1 min
+epoch 8/15  train_loss=1.8239  val_loss=1.5146  val_corr_t0=0.3825  val_corr_t1=0.3852    (epoch 6.3 min, total 56.0 min)
+  epoch 9/15  batch 50  seqs 800/10607  running_loss=1.8459  lr=1.90e-03  23.95 seq/s  ETA 6.8 min
+  epoch 9/15  batch 100  seqs 1600/10607  running_loss=1.8202  lr=1.90e-03  25.72 seq/s  ETA 5.8 min
+  epoch 9/15  batch 150  seqs 2400/10607  running_loss=1.7932  lr=1.90e-03  26.14 seq/s  ETA 5.2 min
+  epoch 9/15  batch 200  seqs 3200/10607  running_loss=1.8085  lr=1.90e-03  26.14 seq/s  ETA 4.7 min
+  epoch 9/15  batch 250  seqs 4000/10607  running_loss=1.8148  lr=1.90e-03  26.37 seq/s  ETA 4.2 min
+  epoch 9/15  batch 300  seqs 4800/10607  running_loss=1.8150  lr=1.90e-03  26.64 seq/s  ETA 3.6 min
+  epoch 9/15  batch 350  seqs 5600/10607  running_loss=1.8112  lr=1.90e-03  26.52 seq/s  ETA 3.1 min
+  epoch 9/15  batch 400  seqs 6400/10607  running_loss=1.8055  lr=1.90e-03  26.69 seq/s  ETA 2.6 min
+  epoch 9/15  batch 450  seqs 7200/10607  running_loss=1.8256  lr=1.90e-03  26.69 seq/s  ETA 2.1 min
+  epoch 9/15  batch 500  seqs 8000/10607  running_loss=1.8205  lr=1.90e-03  26.70 seq/s  ETA 1.6 min
+  epoch 9/15  batch 550  seqs 8800/10607  running_loss=1.8217  lr=1.90e-03  26.73 seq/s  ETA 1.1 min
+  epoch 9/15  batch 600  seqs 9600/10607  running_loss=1.8219  lr=1.90e-03  26.82 seq/s  ETA 0.6 min
+  epoch 9/15  batch 650  seqs 10400/10607  running_loss=1.8208  lr=1.90e-03  26.91 seq/s  ETA 0.1 min
+epoch 9/15  train_loss=1.8202  val_loss=1.5111  val_corr_t0=0.3809  val_corr_t1=0.3961    (epoch 6.6 min, total 63.2 min)
+  epoch 10/15  batch 50  seqs 800/10607  running_loss=1.7611  lr=1.62e-03  27.92 seq/s  ETA 5.9 min
+  epoch 10/15  batch 100  seqs 1600/10607  running_loss=1.8211  lr=1.62e-03  27.79 seq/s  ETA 5.4 min
+  epoch 10/15  batch 150  seqs 2400/10607  running_loss=1.7958  lr=1.62e-03  26.92 seq/s  ETA 5.1 min
+  epoch 10/15  batch 200  seqs 3200/10607  running_loss=1.7900  lr=1.62e-03  27.00 seq/s  ETA 4.6 min
+  epoch 10/15  batch 250  seqs 4000/10607  running_loss=1.8050  lr=1.62e-03  26.90 seq/s  ETA 4.1 min
+  epoch 10/15  batch 300  seqs 4800/10607  running_loss=1.8036  lr=1.62e-03  26.65 seq/s  ETA 3.6 min
+  epoch 10/15  batch 350  seqs 5600/10607  running_loss=1.7963  lr=1.62e-03  26.42 seq/s  ETA 3.2 min
+  epoch 10/15  batch 400  seqs 6400/10607  running_loss=1.8012  lr=1.62e-03  26.51 seq/s  ETA 2.6 min
+  epoch 10/15  batch 450  seqs 7200/10607  running_loss=1.8040  lr=1.62e-03  26.45 seq/s  ETA 2.1 min
+  epoch 10/15  batch 500  seqs 8000/10607  running_loss=1.8036  lr=1.62e-03  26.52 seq/s  ETA 1.6 min
+  epoch 10/15  batch 550  seqs 8800/10607  running_loss=1.7999  lr=1.62e-03  26.58 seq/s  ETA 1.1 min
+  epoch 10/15  batch 600  seqs 9600/10607  running_loss=1.8009  lr=1.62e-03  26.64 seq/s  ETA 0.6 min
+  epoch 10/15  batch 650  seqs 10400/10607  running_loss=1.8139  lr=1.62e-03  26.75 seq/s  ETA 0.1 min
+epoch 10/15  train_loss=1.8138  val_loss=1.5119  val_corr_t0=0.3837  val_corr_t1=0.3923    (epoch 6.6 min, total 70.5 min)
+  epoch 11/15  batch 50  seqs 800/10607  running_loss=1.7598  lr=1.22e-03  25.37 seq/s  ETA 6.4 min
+  epoch 11/15  batch 100  seqs 1600/10607  running_loss=1.7869  lr=1.22e-03  25.68 seq/s  ETA 5.8 min
+  epoch 11/15  batch 150  seqs 2400/10607  running_loss=1.8434  lr=1.22e-03  26.90 seq/s  ETA 5.1 min
+  epoch 11/15  batch 200  seqs 3200/10607  running_loss=1.8382  lr=1.22e-03  27.33 seq/s  ETA 4.5 min
+  epoch 11/15  batch 250  seqs 4000/10607  running_loss=1.8273  lr=1.22e-03  27.82 seq/s  ETA 4.0 min
+  epoch 11/15  batch 300  seqs 4800/10607  running_loss=1.8172  lr=1.22e-03  28.07 seq/s  ETA 3.4 min
+  epoch 11/15  batch 350  seqs 5600/10607  running_loss=1.8131  lr=1.22e-03  28.29 seq/s  ETA 2.9 min
+  epoch 11/15  batch 400  seqs 6400/10607  running_loss=1.8145  lr=1.22e-03  28.41 seq/s  ETA 2.5 min
+  epoch 11/15  batch 450  seqs 7200/10607  running_loss=1.8089  lr=1.22e-03  28.31 seq/s  ETA 2.0 min
+  epoch 11/15  batch 500  seqs 8000/10607  running_loss=1.8042  lr=1.22e-03  28.34 seq/s  ETA 1.5 min
+  epoch 11/15  batch 550  seqs 8800/10607  running_loss=1.8065  lr=1.22e-03  28.30 seq/s  ETA 1.1 min
+  epoch 11/15  batch 600  seqs 9600/10607  running_loss=1.8041  lr=1.22e-03  28.42 seq/s  ETA 0.6 min
+  epoch 11/15  batch 650  seqs 10400/10607  running_loss=1.8045  lr=1.22e-03  28.47 seq/s  ETA 0.1 min
+epoch 11/15  train_loss=1.8059  val_loss=1.5070  val_corr_t0=0.3878  val_corr_t1=0.3978  *best*  (epoch 6.2 min, total 77.4 min)
+  epoch 12/15  batch 50  seqs 800/10607  running_loss=1.7297  lr=7.77e-04  27.43 seq/s  ETA 6.0 min
+  epoch 12/15  batch 100  seqs 1600/10607  running_loss=1.7262  lr=7.77e-04  25.18 seq/s  ETA 6.0 min
+  epoch 12/15  batch 150  seqs 2400/10607  running_loss=1.7595  lr=7.77e-04  25.34 seq/s  ETA 5.4 min
+  epoch 12/15  batch 200  seqs 3200/10607  running_loss=1.7634  lr=7.77e-04  24.95 seq/s  ETA 4.9 min
+  epoch 12/15  batch 250  seqs 4000/10607  running_loss=1.7773  lr=7.77e-04  24.45 seq/s  ETA 4.5 min
+  epoch 12/15  batch 300  seqs 4800/10607  running_loss=1.7784  lr=7.77e-04  24.43 seq/s  ETA 4.0 min
+  epoch 12/15  batch 350  seqs 5600/10607  running_loss=1.7834  lr=7.77e-04  24.27 seq/s  ETA 3.4 min
+  epoch 12/15  batch 400  seqs 6400/10607  running_loss=1.7893  lr=7.77e-04  24.15 seq/s  ETA 2.9 min
+  epoch 12/15  batch 450  seqs 7200/10607  running_loss=1.7896  lr=7.77e-04  24.15 seq/s  ETA 2.4 min
+  epoch 12/15  batch 500  seqs 8000/10607  running_loss=1.8045  lr=7.77e-04  24.21 seq/s  ETA 1.8 min
+  epoch 12/15  batch 550  seqs 8800/10607  running_loss=1.8051  lr=7.77e-04  24.19 seq/s  ETA 1.2 min
+  epoch 12/15  batch 600  seqs 9600/10607  running_loss=1.8008  lr=7.77e-04  24.14 seq/s  ETA 0.7 min
+  epoch 12/15  batch 650  seqs 10400/10607  running_loss=1.7962  lr=7.77e-04  24.13 seq/s  ETA 0.1 min
+epoch 12/15  train_loss=1.7963  val_loss=1.5070  val_corr_t0=0.3904  val_corr_t1=0.3923    (epoch 7.3 min, total 85.5 min)
+  epoch 13/15  batch 50  seqs 800/10607  running_loss=1.7082  lr=3.77e-04  22.78 seq/s  ETA 7.2 min
+  epoch 13/15  batch 100  seqs 1600/10607  running_loss=1.7058  lr=3.77e-04  22.11 seq/s  ETA 6.8 min
+  epoch 13/15  batch 150  seqs 2400/10607  running_loss=1.7411  lr=3.77e-04  22.50 seq/s  ETA 6.1 min
+  epoch 13/15  batch 200  seqs 3200/10607  running_loss=1.7467  lr=3.77e-04  22.51 seq/s  ETA 5.5 min
+  epoch 13/15  batch 250  seqs 4000/10607  running_loss=1.7412  lr=3.77e-04  22.91 seq/s  ETA 4.8 min
+  epoch 13/15  batch 300  seqs 4800/10607  running_loss=1.7548  lr=3.77e-04  22.42 seq/s  ETA 4.3 min
+  epoch 13/15  batch 350  seqs 5600/10607  running_loss=1.7621  lr=3.77e-04  22.34 seq/s  ETA 3.7 min
+  epoch 13/15  batch 400  seqs 6400/10607  running_loss=1.7636  lr=3.77e-04  22.27 seq/s  ETA 3.1 min
+  epoch 13/15  batch 450  seqs 7200/10607  running_loss=1.7664  lr=3.77e-04  22.28 seq/s  ETA 2.5 min
+  epoch 13/15  batch 500  seqs 8000/10607  running_loss=1.7850  lr=3.77e-04  22.24 seq/s  ETA 2.0 min
+  epoch 13/15  batch 550  seqs 8800/10607  running_loss=1.7855  lr=3.77e-04  22.34 seq/s  ETA 1.3 min
+  epoch 13/15  batch 600  seqs 9600/10607  running_loss=1.7863  lr=3.77e-04  22.47 seq/s  ETA 0.7 min
+  epoch 13/15  batch 650  seqs 10400/10607  running_loss=1.7867  lr=3.77e-04  22.64 seq/s  ETA 0.2 min
+epoch 13/15  train_loss=1.7872  val_loss=1.4988  val_corr_t0=0.3936  val_corr_t1=0.4000  *best*  (epoch 7.8 min, total 94.0 min)
+  epoch 14/15  batch 50  seqs 800/10607  running_loss=1.7973  lr=9.90e-05  26.97 seq/s  ETA 6.1 min
+  epoch 14/15  batch 100  seqs 1600/10607  running_loss=1.8028  lr=9.90e-05  26.47 seq/s  ETA 5.7 min
+  epoch 14/15  batch 150  seqs 2400/10607  running_loss=1.7578  lr=9.90e-05  25.85 seq/s  ETA 5.3 min
+  epoch 14/15  batch 200  seqs 3200/10607  running_loss=1.7505  lr=9.90e-05  25.68 seq/s  ETA 4.8 min
+  epoch 14/15  batch 250  seqs 4000/10607  running_loss=1.7508  lr=9.90e-05  25.52 seq/s  ETA 4.3 min
+  epoch 14/15  batch 300  seqs 4800/10607  running_loss=1.7470  lr=9.90e-05  24.92 seq/s  ETA 3.9 min
+  epoch 14/15  batch 350  seqs 5600/10607  running_loss=1.7484  lr=9.90e-05  24.43 seq/s  ETA 3.4 min
+  epoch 14/15  batch 400  seqs 6400/10607  running_loss=1.7539  lr=9.90e-05  24.19 seq/s  ETA 2.9 min
+  epoch 14/15  batch 450  seqs 7200/10607  running_loss=1.7683  lr=9.90e-05  24.15 seq/s  ETA 2.4 min
+  epoch 14/15  batch 500  seqs 8000/10607  running_loss=1.7746  lr=9.90e-05  24.17 seq/s  ETA 1.8 min
+  epoch 14/15  batch 550  seqs 8800/10607  running_loss=1.7771  lr=9.90e-05  24.24 seq/s  ETA 1.2 min
+  epoch 14/15  batch 600  seqs 9600/10607  running_loss=1.7778  lr=9.90e-05  24.22 seq/s  ETA 0.7 min
+  epoch 14/15  batch 650  seqs 10400/10607  running_loss=1.7797  lr=9.90e-05  24.26 seq/s  ETA 0.1 min
+epoch 14/15  train_loss=1.7800  val_loss=1.4997  val_corr_t0=0.3921  val_corr_t1=0.3987    (epoch 7.3 min, total 102.2 min)
+  epoch 15/15  batch 50  seqs 800/10607  running_loss=1.7561  lr=0.00e+00  23.99 seq/s  ETA 6.8 min
+  epoch 15/15  batch 100  seqs 1600/10607  running_loss=1.7611  lr=0.00e+00  23.79 seq/s  ETA 6.3 min
+  epoch 15/15  batch 150  seqs 2400/10607  running_loss=1.7807  lr=0.00e+00  23.80 seq/s  ETA 5.7 min
+  epoch 15/15  batch 200  seqs 3200/10607  running_loss=1.8111  lr=0.00e+00  23.74 seq/s  ETA 5.2 min
+  epoch 15/15  batch 250  seqs 4000/10607  running_loss=1.8067  lr=0.00e+00  23.94 seq/s  ETA 4.6 min
+  epoch 15/15  batch 300  seqs 4800/10607  running_loss=1.7999  lr=0.00e+00  24.06 seq/s  ETA 4.0 min
+  epoch 15/15  batch 350  seqs 5600/10607  running_loss=1.7988  lr=0.00e+00  24.22 seq/s  ETA 3.4 min
+  epoch 15/15  batch 400  seqs 6400/10607  running_loss=1.7938  lr=0.00e+00  24.26 seq/s  ETA 2.9 min
+  epoch 15/15  batch 450  seqs 7200/10607  running_loss=1.7907  lr=0.00e+00  24.18 seq/s  ETA 2.3 min
+  epoch 15/15  batch 500  seqs 8000/10607  running_loss=1.7875  lr=0.00e+00  24.08 seq/s  ETA 1.8 min
+  epoch 15/15  batch 550  seqs 8800/10607  running_loss=1.7831  lr=0.00e+00  24.16 seq/s  ETA 1.2 min
+  epoch 15/15  batch 600  seqs 9600/10607  running_loss=1.7794  lr=0.00e+00  24.17 seq/s  ETA 0.7 min
+  epoch 15/15  batch 650  seqs 10400/10607  running_loss=1.7767  lr=0.00e+00  24.33 seq/s  ETA 0.1 min
+epoch 15/15  train_loss=1.7777  val_loss=1.4997  val_corr_t0=0.3921  val_corr_t1=0.3987    (epoch 7.3 min, total 110.1 min)
+
+done. best val score (mean corr) = 0.3968
+best checkpoint: /Users/mingda/Desktop/wunderfund/wunderfund/experiment_1_training/runs/tcn_experiment1_7_best.pt
+latest checkpoint: /Users/mingda/Desktop/wunderfund/wunderfund/experiment_1_training/runs/tcn_experiment1_7_latest.pt
+
+next step: run extract_numpy_weights.py to convert the checkpoint into the pure-numpy format solution.py expects (see model_training.md).

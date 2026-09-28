@@ -31,7 +31,10 @@ DROPOUT = 0.1
 
 # --- Data ---
 N_TRAIN_SEQUENCES = None      # None = all 10,607 sequences in train.parquet; or an int to cap
-N_VALID_SEQUENCES = 100       # held-out sequences used for checkpoint selection (from valid_sample.parquet)
+N_VALID_SEQUENCES = 150       # all sequences in valid_sample.parquet, used purely for checkpoint
+                                # selection/early stopping — never trained on. (Decided against also
+                                # training on valid.parquet: it would raise the local WP estimate but
+                                # risks overfitting to it with no way to detect that locally.)
 TRAIN_SEED = 0                 # controls per-epoch shuffle order
 USE_PLS = False                 # append the 20-dim PLS factor-compression channels;
                                  # notes.md Phase 5 found this cost +51% latency for +0.0013 WP
