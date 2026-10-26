@@ -1,19 +1,28 @@
-"""Alpha Connectome submission — causal TCN, pure-numpy streaming inference.
+"""Alpha Connectome submission — PLS-augmented causal TCN variant.
 
-Architecture: 7-layer causal dilated Conv1d (kernel=3, dilations 1..64,
-receptive field 255 steps, 48 channels), trained on the standardized raw
-112 features with an MSE loss weighted by |clip(target,-2,2)| (mirrors the
-WP scoring metric's own weighting). See MODEL.md for the full write-up:
-training data/recipe, why PLS factor-compression and a LightGBM ensemble
-were tried and NOT adopted, and validation numbers.
+Same pure-numpy streaming TCN as solution.py (fused-matmul incremental
+inference, see that file's docstring for the derivation/verification of
+the streaming math and the matmul fusion), but this checkpoint was
+trained on 132 input channels: the 112 standardized raw features plus 20
+supervised PLS factor-compression components (eda/notes.md §6/§11).
 
-Inference is pure numpy (no torch at runtime): each conv layer keeps a
-small ring buffer of just its own required past inputs (2*dilation+1) and
-does an O(1) update per step — true incremental (WaveNet-style) streaming,
-not a windowed replay — verified against the batched PyTorch training
-forward pass to ~1e-6 precision. Measured 63.6us/row on this dev machine
-(1 CPU thread), projecting to ~40 min for a 1873-sequence test set, well
-inside the 60-minute budget.
+solution.py's predict() never computed this projection — it only ever
+fed the 112 raw-standardized features into the TCN — so it cannot run a
+PLS-trained checkpoint at all (hard shape mismatch at the first layer's
+fused matmul, not a silent wrong-answer bug; confirmed by trying it
+directly). This file is the correct home for that checkpoint: it adds the
+one extra step (a single (20,112) matvec, ~2.3us measured — negligible)
+before handing off to the identical TCN code.
+
+Measured with the current (fused) implementation on this exact
+checkpoint (8 layers, dilations 1..128, 132-channel input):
+  - TCN compute only: ~54.9us/row
+  - PLS projection: ~2.3us/row
+  - projected total for a 1,873-sequence test set: ~36 min — comfortably
+    inside the 60-minute budget. (The original fear that PLS would blow
+    the budget was based on a latency figure measured before the matmul
+    fusion existed; re-measured with the current code before building
+    this file, not assumed.)
 """
 from __future__ import annotations
 
@@ -26,7 +35,7 @@ _ARTIFACT_DIR = Path(__file__).resolve().parent
 
 
 def _load_weights():
-    d = np.load(_ARTIFACT_DIR / "tcn_experiment1_7_best_numpy150.npz")
+    d = np.load(_ARTIFACT_DIR / "tcn_full_PLS_best_numpy.npz")
     n_layers = int(d["n_layers"])
     layers = []
     for i in range(n_layers):
@@ -46,15 +55,24 @@ def _load_standardization():
     return d["mean"], d["std"]
 
 
+def _load_pls():
+    d = np.load(_ARTIFACT_DIR / "pls_weights.npz")
+    return d["x_mean"], d["rotations"]  # (112,), (112, 20)
+
+
 class StreamingCausalTCN:
-    """True incremental causal-conv inference — O(1) compute per step per
-    layer via a small ring buffer, not a windowed full-receptive-field
-    replay. See notes.md Phase 4a for the derivation/verification."""
+    """Identical to solution.py's class — see there for the fused-matmul
+    derivation/verification. Duplicated here (not imported) so this file
+    stays self-contained and renameable to solution.py on its own for a
+    submission zip, exactly like solution.py itself doesn't depend on
+    anything outside this directory."""
 
     def __init__(self, layers, head_w, head_b):
         self.layers = layers
         self.head_w = head_w
         self.head_b = head_b
+        self.ws_fused = [layer["w"].transpose(0, 2, 1).reshape(layer["w"].shape[0], -1)
+                          for layer in layers]
         self.reset()
 
     def reset(self):
@@ -71,9 +89,8 @@ class StreamingCausalTCN:
             buf[-1] = cur
 
             d = layer["dilation"]
-            tap_old, tap_mid, tap_new = buf[0], buf[d], buf[-1]
-            w = layer["w"]
-            conv_out = w[:, :, 0] @ tap_old + w[:, :, 1] @ tap_mid + w[:, :, 2] @ tap_new + layer["b"]
+            taps = np.concatenate([buf[0], buf[d], buf[-1]])
+            conv_out = self.ws_fused[i] @ taps + layer["b"]
             conv_out = np.maximum(conv_out, 0.0)
 
             if layer["dw"] is not None:
@@ -89,6 +106,7 @@ class PredictionModel:
     def __init__(self):
         layers, head_w, head_b = _load_weights()
         self.mean, self.std = _load_standardization()
+        self.pls_x_mean, self.pls_rotations = _load_pls()
         self.tcn = StreamingCausalTCN(layers, head_w, head_b)
         self.seq_ix = None
 
@@ -99,7 +117,9 @@ class PredictionModel:
 
         raw = np.asarray(data_point.state, dtype=np.float64)
         std_row = (raw - self.mean) / self.std
-        pred = self.tcn.step(std_row)
+        pls_row = (std_row - self.pls_x_mean) @ self.pls_rotations  # (20,)
+        full_row = np.concatenate([std_row, pls_row])  # (132,)
+        pred = self.tcn.step(full_row)
 
         if not data_point.need_prediction:
             return None

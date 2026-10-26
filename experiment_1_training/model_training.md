@@ -5,6 +5,19 @@ Builds on `full_training/train_TCN.py` (read that folder's
 Three deliberate changes, bundled into one run per your request, plus two
 real bugs this work uncovered and fixed along the way.
 
+**Outcome, per your real submission results**: this experiment's
+submitted checkpoint scored worse than the `full_training` baseline
+(0.6414 WP) — the `wp_aligned_loss` change was **not** the right move,
+confirmed on the actual leaderboard, not just a local estimate. The
+architecture/schedule changes (+1 layer, delayed LR decay) were bundled
+into the same run and weren't isolated, so this result alone doesn't tell
+us which specific change(s) hurt — only that the combination did. The
+active line of work has reverted to `full_training`'s original recipe
+(plain `weighted_mse_loss`) with the validation-accuracy fixes below
+ported back there. This folder is kept for reference and as a base for
+future isolated architecture experiments, not currently the one being
+pursued.
+
 ## What changed and why
 
 ### 1. New loss function: `wp_aligned_loss`
@@ -90,22 +103,33 @@ noticeably less noisy epoch to epoch.
 This doesn't fit in memory at once (1,873 × 20,000 × 112 × 4 bytes ≈
 16.8GB for the features alone — over the 16GB budget by itself, before
 the model/optimizer/OS). So `evaluate_streaming()` reads `VALID_BATCH_SIZE`
-(32) sequences at a time from disk, evaluates, discards, and accumulates
-the six running sums needed for an exact single-pass Pearson correlation
-(`n, sum_p, sum_y, sum_p·y, sum_p², sum_y²`) — the same streaming approach
-already used in `eda/scripts/streaming_stats.py` for the original
-full-dataset EDA. This is **not** the same as averaging per-batch
-correlations (which would be a statistically different, worse estimate);
-verified the math is exact by comparing it against directly pooling and
-computing `np.corrcoef` on synthetic batches of varying size and scale —
-matched to 1e-16 (float64 rounding noise only).
+(32) sequences at a time from disk, evaluates, and discards.
+
+**Revised since this was first written**: the first version of this
+function computed an exact single-pass *pooled, unweighted, unclipped*
+Pearson correlation across every `need_prediction` row (accumulating six
+running sums — `n, sum_p, sum_y, sum_p·y, sum_p², sum_y²` — the same
+streaming approach used in `eda/scripts/streaming_stats.py`). That math
+was verified exact against `np.corrcoef` on synthetic batches (matched to
+1e-16) — but "exact" only means it correctly computed *that* statistic,
+which turned out not to be the same quantity as the real WP metric
+(no `is_scored` filtering, no clipping, pooled instead of per-sequence-
+then-averaged). After the real submitted score with the full_training
+version of this came back slightly *worse* than the smaller-sample run,
+not better, `evaluate_streaming` was rewritten to feed every sequence
+straight into **`utils.BlockAccumulator`** — the competition's own
+scoring class, used verbatim — so "best val score" is now the literal WP
+metric, not an approximation of it. Verified bit-identical (6 decimal
+places) against the independently-written `eda/scripts/eval_harness.py`
+path on an actual trained checkpoint before trusting this (see
+`full_training/model_training.md` for the exact numbers — this file's
+`evaluate_streaming` is the same code, ported back there).
 
 **Cost**: this reads through all of `valid.parquet` once per epoch (every
 `VALIDATE_EVERY_N_EPOCHS`, currently every epoch), which is real added
 time — at the ~20-30 seq/s I/O rate observed in the full_training run,
 figure roughly 60-90s per validation pass, ×15 epochs ≈ **15-25 minutes
-added to total training time**. Worth it for the accuracy, per your ask,
-but worth knowing going in.
+added to total training time**.
 
 **Consequence worth knowing**: since *every* sequence in `valid.parquet`
 is now used for checkpoint selection in *every* future run, there's no

@@ -45,8 +45,8 @@ from __future__ import annotations
 # ============================================================================
 
 # --- Architecture ---
-N_CHANNELS = 48                              # unchanged from full_training/
-DILATIONS = (1, 2, 4, 8, 16, 32, 64)     # NOTE: this is the same 7-layer schedule as full_training/ —
+N_CHANNELS = 64                              # unchanged from full_training/
+DILATIONS = (1, 2, 4, 8, 16, 32, 64, 128)     # NOTE: this is the same 7-layer schedule as full_training/ —
                                               # if you meant to keep the "+1 layer" change from the
                                               # original plan, add 128 back in (see model_training.md)
                                               # receptive field = 1 + 2*sum(DILATIONS) = 255 steps
@@ -63,7 +63,7 @@ TRAIN_SEED = 0
 USE_PLS = False
 
 # --- Training ---
-N_EPOCHS = 15                    # unchanged, per the plan to isolate the loss/architecture/schedule effect
+N_EPOCHS = 30                    # unchanged, per the plan to isolate the loss/architecture/schedule effect
 BATCH_SIZE = 16
 VALID_BATCH_SIZE = 32            # sequences per streaming-validation batch; can be larger than
                                   # BATCH_SIZE since eval has no backward pass / gradient memory
@@ -76,7 +76,7 @@ GRAD_CLIP = 1.0
 VALIDATE_EVERY_N_EPOCHS = 1
 
 # --- Output / resuming ---
-RUN_NAME = "tcn_experiment1_7"
+RUN_NAME = "tcn_e1_8l_64d"
 RESUME_FROM = None                # a different architecture from full_training/'s checkpoint (8 layers,
                                    # not 7) — cannot resume from tcn_full_best.pt, only from a run of
                                    # this same script
@@ -114,10 +114,15 @@ def _find_eda_scripts():
 EDA_SCRIPTS = _find_eda_scripts()
 sys.path.insert(0, str(EDA_SCRIPTS))
 
-from common import (TABLES_DIR, FEATURE_COLUMNS,
+from common import (TABLES_DIR, FEATURE_COLUMNS, REPO_DIR,
                      WARMUP, SEQUENCE_LENGTH, TRAIN_PATH, VALID_PATH)  # noqa: E402
 from tcn_model import CausalTCN  # noqa: E402
 from train_tcn import weighted_mse_loss  # noqa: E402  (kept importable for LOSS_TYPE="weighted_mse")
+
+sys.path.insert(0, str(REPO_DIR))
+from utils import BlockAccumulator  # noqa: E402  (the competition's own scorer — reused verbatim
+                                     # for validation so "best val score" during training is the
+                                     # real WP metric, not an approximation of it)
 
 if USE_PLS:
     from pls_transform import pls_scores_batch, N_PLS_COMPONENTS  # noqa: E402
@@ -127,6 +132,7 @@ OUT_DIR.mkdir(exist_ok=True)
 
 DEVICE = "mps" if torch.backends.mps.is_available() else "cpu"
 COLUMNS = list(FEATURE_COLUMNS) + ["t0", "t1"]
+EVAL_COLUMNS = COLUMNS + ["is_scored"]  # is_scored only exists in valid.parquet
 METRIC_CLIP = 2.0
 
 
@@ -214,20 +220,44 @@ def read_one_sequence(pf, group_index, means, stds):
     return x, y
 
 
+def read_one_eval_sequence(pf, group_index, means, stds):
+    """Like read_one_sequence, but also reads is_scored so validation can
+    be restricted to exactly the rows the real metric scores — not every
+    need_prediction row, which is what the training loss (necessarily)
+    uses since is_scored is never available at real inference time."""
+    table = pf.read_row_group(group_index, columns=EVAL_COLUMNS)
+    raw = np.column_stack(
+        [table.column(c).to_numpy(zero_copy_only=False) for c in FEATURE_COLUMNS]
+    ).astype(np.float64)
+    raw_std = (raw - means) / stds
+    if USE_PLS:
+        full = np.concatenate([raw_std, pls_scores_batch(raw_std)], axis=1)
+    else:
+        full = raw_std
+    x = full.T.astype(np.float32)
+    y = np.empty((2, SEQUENCE_LENGTH), dtype=np.float32)
+    y[0] = table.column("t0").to_numpy(zero_copy_only=False).astype(np.float32)
+    y[1] = table.column("t1").to_numpy(zero_copy_only=False).astype(np.float32)
+    is_scored = table.column("is_scored").to_numpy(zero_copy_only=False).astype(bool)
+    return x, y, is_scored
+
+
 def iter_eval_batches(pf, group_indices, means, stds, batch_size):
     """Same idea as iter_train_batches but for evaluation: sequential (no
-    shuffle needed — order doesn't affect a pooled correlation), streamed
-    directly from disk, never holding more than batch_size sequences in
-    memory. Used to stream the full 1,873-sequence valid.parquet at the
-    end of every epoch without ever loading it all at once."""
+    shuffle needed), streamed directly from disk, never holding more than
+    batch_size sequences in memory. Used to stream the full 1,873-sequence
+    valid.parquet at the end of every epoch without ever loading it all
+    at once. Also yields the is_scored mask per sequence so
+    evaluate_streaming can score exactly the rows the real metric scores."""
     n_ch = n_input_channels()
     for start in range(0, len(group_indices), batch_size):
         chunk = group_indices[start:start + batch_size]
         X = np.empty((len(chunk), n_ch, SEQUENCE_LENGTH), dtype=np.float32)
         Y = np.empty((len(chunk), 2, SEQUENCE_LENGTH), dtype=np.float32)
+        is_scored_batch = np.empty((len(chunk), SEQUENCE_LENGTH), dtype=bool)
         for i, gi in enumerate(chunk):
-            X[i], Y[i] = read_one_sequence(pf, gi, means, stds)
-        yield torch.from_numpy(X), torch.from_numpy(Y)
+            X[i], Y[i], is_scored_batch[i] = read_one_eval_sequence(pf, gi, means, stds)
+        yield torch.from_numpy(X), torch.from_numpy(Y), is_scored_batch
 
 
 def iter_train_batches(pf, group_indices, means, stds, rng):
@@ -251,60 +281,54 @@ def evaluate_streaming(model, loss_fn, parquet_path, group_indices, means, stds,
     features alone, over the 16GB budget). Reads batch_size sequences at a
     time, evaluates, discards, and moves on.
 
-    Correlation is NOT computed by averaging per-batch correlations — that
-    would be a statistically different (and worse) number than the true
-    pooled correlation across every scored row in the whole set. Instead
-    this accumulates the six running sums (n, sum_p, sum_y, sum_p*y,
-    sum_p^2, sum_y^2) needed for a single-pass exact Pearson correlation —
-    the same one-pass approach already used in
-    eda/scripts/streaming_stats.py for the full-dataset EDA — and computes
-    the real pooled correlation from those sums once every batch has been
-    seen.
+    The reported score is now the **real WP metric**, not an approximation
+    of it: predictions/targets for every sequence are fed straight into
+    `utils.BlockAccumulator` — the competition's own scoring class (clips
+    to [-2,2], weights by |clipped target|, restricts to is_scored rows,
+    computes weighted Pearson per sequence, averages t0/t1, then averages
+    equally across sequences) — so "best val score" during training is
+    now literally comparable to what the leaderboard reports. Verified
+    bit-identical (6 decimal places) against the independently-written
+    eda/scripts/eval_harness.py path on the same checkpoint/sequences
+    before being trusted here — see full_training/model_training.md.
+
+    val_loss is still computed over every need_prediction row (unweighted
+    by is_scored), matching exactly what the training loss itself uses —
+    is_scored is never available at real inference time, so the training
+    objective can't depend on it; this keeps val_loss and train_loss
+    directly comparable, while the score used for checkpoint selection is
+    the metric-faithful one above.
     """
     model.eval()
     pf = pq.ParquetFile(parquet_path)
+    accumulator = BlockAccumulator()
 
     total_loss = 0.0
     n_seq_seen = 0
-    n = np.zeros(2, dtype=np.float64)
-    sum_p = np.zeros(2, dtype=np.float64)
-    sum_y = np.zeros(2, dtype=np.float64)
-    sum_py = np.zeros(2, dtype=np.float64)
-    sum_p2 = np.zeros(2, dtype=np.float64)
-    sum_y2 = np.zeros(2, dtype=np.float64)
 
     with torch.no_grad():
-        for b, (xb, yb) in enumerate(iter_eval_batches(pf, group_indices, means, stds, batch_size)):
-            xb = xb.to(DEVICE)
-            yb = yb.to(DEVICE)
-            pred = model(xb)
-            p = pred[:, :, WARMUP:]
-            y = yb[:, :, WARMUP:]
+        for b, (xb, yb, is_scored_batch) in enumerate(
+                iter_eval_batches(pf, group_indices, means, stds, batch_size)):
+            xb_d = xb.to(DEVICE)
+            yb_d = yb.to(DEVICE)
+            pred = model(xb_d)
 
-            batch_loss = loss_fn(p, y).item()
+            batch_loss = loss_fn(pred[:, :, WARMUP:], yb_d[:, :, WARMUP:]).item()
             total_loss += batch_loss * xb.shape[0]
             n_seq_seen += xb.shape[0]
 
-            for j in range(2):
-                pj = p[:, j].reshape(-1).cpu().numpy().astype(np.float64)
-                yj = y[:, j].reshape(-1).cpu().numpy().astype(np.float64)
-                n[j] += pj.shape[0]
-                sum_p[j] += pj.sum()
-                sum_y[j] += yj.sum()
-                sum_py[j] += (pj * yj).sum()
-                sum_p2[j] += (pj * pj).sum()
-                sum_y2[j] += (yj * yj).sum()
+            pred_np = pred.cpu().numpy().astype(np.float32)  # (batch, 2, 20000)
+            targets_np = yb.numpy()                          # (batch, 2, 20000), already float32
+
+            for i in range(xb.shape[0]):
+                accumulator.add(targets_np[i].T, pred_np[i].T, is_scored_batch[i])
 
             if (b + 1) % 20 == 0:
                 print(f"  [{desc}] {n_seq_seen}/{len(group_indices)} sequences", flush=True)
 
     val_loss = total_loss / max(n_seq_seen, 1)
-    corrs = []
-    for j in range(2):
-        num = n[j] * sum_py[j] - sum_p[j] * sum_y[j]
-        den = np.sqrt(max((n[j] * sum_p2[j] - sum_p[j] ** 2) * (n[j] * sum_y2[j] - sum_y[j] ** 2), 0.0))
-        corrs.append(float(num / den) if den > 1e-12 else 0.0)
-    return val_loss, corrs[0], corrs[1]
+    result = accumulator.result()
+    return val_loss, result["t0"], result["t1"]
 
 
 def save_checkpoint(path, model, opt, sched, epoch, best_score, n_input):
@@ -419,15 +443,15 @@ def main():
             epoch_elapsed = time.time() - epoch_t0
 
             if (epoch + 1) % VALIDATE_EVERY_N_EPOCHS == 0 or epoch == N_EPOCHS - 1:
-                val_loss, corr0, corr1 = evaluate_streaming(
+                val_loss, wp_t0, wp_t1 = evaluate_streaming(
                     model, loss_fn, VALID_PATH, valid_groups, means, stds, VALID_BATCH_SIZE)
-                score = (corr0 + corr1) / 2
+                score = (wp_t0 + wp_t1) / 2  # == BlockAccumulator's own "weighted_pearson" field
                 is_best = score > best_score
                 if is_best:
                     best_score = score
                     save_checkpoint(best_path, model, opt, sched, epoch, best_score, n_input)
                 log(f"epoch {epoch+1}/{N_EPOCHS}  train_loss={train_loss:.4f}  "
-                    f"val_loss={val_loss:.4f}  val_corr_t0={corr0:.4f}  val_corr_t1={corr1:.4f}  "
+                    f"val_loss={val_loss:.4f}  val_wp_t0={wp_t0:.4f}  val_wp_t1={wp_t1:.4f}  "
                     f"{'*best*' if is_best else ''}  "
                     f"(epoch {epoch_elapsed/60:.1f} min, total {((time.time()-t_start)/60):.1f} min)")
 
@@ -438,7 +462,7 @@ def main():
             f"(re-run with RESUME_FROM = '{latest_path}' to continue)")
         return
 
-    log(f"\ndone. best val score (mean corr) = {best_score:.4f}")
+    log(f"\ndone. best val score (real WP metric, mean of t0/t1) = {best_score:.4f}")
     log(f"best checkpoint: {best_path}")
     log(f"latest checkpoint: {latest_path}")
     log("\nnext step: run extract_numpy_weights.py to convert the checkpoint into the "

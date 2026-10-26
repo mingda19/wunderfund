@@ -6,6 +6,11 @@ instead of loading sequences into memory upfront, since the full file
 why streaming is necessary, what each config knob does, expected runtime,
 and what to do with the checkpoint afterward.
 
+Validation uses all 1,873 sequences of the real valid.parquet (not a
+150-sequence sample), streamed VALID_BATCH_SIZE at a time at the end of
+every epoch for the same reason training streams — the full set doesn't
+fit in memory either (~16.8GB as float32 features alone).
+
 HOW TO RUN (after closing other CPU/GPU-heavy processes):
     cd full_training
     python3 train_TCN.py
@@ -23,18 +28,20 @@ from __future__ import annotations
 # ============================================================================
 
 # --- Architecture (the two knobs you asked to tune: layers and channels) ---
-N_CHANNELS = 48                          # width of every hidden conv layer
-DILATIONS = (1, 2, 4, 8, 16, 32, 64)     # one entry per layer -> len(DILATIONS) layers;
+N_CHANNELS = 64                          # width of every hidden conv layer
+DILATIONS = (1, 2, 4, 8, 16, 32, 64, 128)     # one entry per layer -> len(DILATIONS) layers;
                                           # receptive field = 1 + 2*sum(DILATIONS) steps
                                           # (kernel size is fixed at 3 in tcn_model.py)
 DROPOUT = 0.1
 
 # --- Data ---
 N_TRAIN_SEQUENCES = None      # None = all 10,607 sequences in train.parquet; or an int to cap
-N_VALID_SEQUENCES = 150       # all sequences in valid_sample.parquet, used purely for checkpoint
-                                # selection/early stopping — never trained on. (Decided against also
-                                # training on valid.parquet: it would raise the local WP estimate but
-                                # risks overfitting to it with no way to detect that locally.)
+N_VALID_SEQUENCES = None      # None = all 1,873 sequences in the real valid.parquet; or an int to cap.
+                                # Streamed batch-by-batch at the end of every epoch (see
+                                # evaluate_streaming below) — never held fully in memory. Checkpoint
+                                # selection/early stopping only — never trained on. (Decided against
+                                # also training on valid.parquet: it would raise the local WP estimate
+                                # but risks overfitting to it with no way to detect that locally.)
 TRAIN_SEED = 0                 # controls per-epoch shuffle order
 USE_PLS = False                 # append the 20-dim PLS factor-compression channels;
                                  # notes.md Phase 5 found this cost +51% latency for +0.0013 WP
@@ -42,8 +49,10 @@ USE_PLS = False                 # append the 20-dim PLS factor-compression chann
                                  # training on ~18x more data it may be worth re-testing
 
 # --- Training ---
-N_EPOCHS = 15
+N_EPOCHS = 30
 BATCH_SIZE = 16                 # sequences per mini-batch (each is a full 20,000-step sequence)
+VALID_BATCH_SIZE = 32           # sequences per streaming-validation batch; can exceed BATCH_SIZE
+                                 # since eval has no backward pass / gradient memory
 LEARNING_RATE = 2e-3
 WEIGHTED_LOSS = True             # MSE weighted by |clip(target,-2,2)| — mirrors the WP metric;
                                   # this was the single biggest lever in every experiment so far
@@ -51,9 +60,9 @@ GRAD_CLIP = 1.0                  # set to None to disable
 VALIDATE_EVERY_N_EPOCHS = 1
 
 # --- Output / resuming ---
-RUN_NAME = "tcn_full"                    # checkpoints saved as <RUN_NAME>_latest.pt / _best.pt
-RESUME_FROM = None                       # path to a previous "_latest.pt" to continue training, or None
-LOG_EVERY_N_BATCHES = 50                 # progress print frequency within an epoch
+RUN_NAME = "tcn_full_l8_64d"                    # checkpoints saved as <RUN_NAME>_latest.pt / _best.pt
+RESUME_FROM = None                      # path to a previous "_latest.pt" to continue training, or None
+LOG_EVERY_N_BATCHES = 200                 # progress print frequency within an epoch
 
 # ============================================================================
 # Implementation — shouldn't need to touch anything below this line.
@@ -87,8 +96,13 @@ def _find_eda_scripts():
 EDA_SCRIPTS = _find_eda_scripts()
 sys.path.insert(0, str(EDA_SCRIPTS))
 
-from common import (ARTIFACTS_DIR as EDA_ARTIFACTS_DIR, TABLES_DIR, FEATURE_COLUMNS,
-                     WARMUP, SEQUENCE_LENGTH, TRAIN_PATH)  # noqa: E402
+from common import (TABLES_DIR, FEATURE_COLUMNS, REPO_DIR,
+                     WARMUP, SEQUENCE_LENGTH, TRAIN_PATH, VALID_PATH)  # noqa: E402
+
+sys.path.insert(0, str(REPO_DIR))
+from utils import BlockAccumulator  # noqa: E402  (the competition's own scorer — reused verbatim
+                                     # for validation so "best val score" during training is the
+                                     # real WP metric, not an approximation of it)
 from tcn_model import CausalTCN  # noqa: E402
 from train_tcn import weighted_mse_loss  # noqa: E402  (pure function, safe to reuse)
 
@@ -100,6 +114,12 @@ OUT_DIR.mkdir(exist_ok=True)
 
 DEVICE = "mps" if torch.backends.mps.is_available() else "cpu"
 COLUMNS = list(FEATURE_COLUMNS) + ["t0", "t1"]
+# is_scored only exists in valid.parquet (never train.parquet, and never
+# provided at real inference time either) — a separate column list for the
+# validation read path so the real WP metric can be computed exactly
+# (is_scored-filtered), while training reads stay identical to what the
+# model actually sees at submission time.
+EVAL_COLUMNS = COLUMNS + ["is_scored"]
 
 
 def load_standardization():
@@ -131,19 +151,45 @@ def read_one_sequence(pf, group_index, means, stds):
     return x, y
 
 
-def load_fixed_set(parquet_path, group_indices, means, stds, desc=""):
-    """Load a modest, fixed set of full sequences into memory once (used
-    for validation — small enough to fit, and reused unchanged every
-    epoch rather than re-read from disk each time)."""
-    pf = pq.ParquetFile(parquet_path)
+def read_one_eval_sequence(pf, group_index, means, stds):
+    """Like read_one_sequence, but also reads is_scored so validation can
+    be restricted to exactly the rows the real metric scores — not every
+    need_prediction row, which is what the training loss (necessarily)
+    uses since is_scored is never available at real inference time."""
+    table = pf.read_row_group(group_index, columns=EVAL_COLUMNS)
+    raw = np.column_stack(
+        [table.column(c).to_numpy(zero_copy_only=False) for c in FEATURE_COLUMNS]
+    ).astype(np.float64)
+    raw_std = (raw - means) / stds
+    if USE_PLS:
+        full = np.concatenate([raw_std, pls_scores_batch(raw_std)], axis=1)
+    else:
+        full = raw_std
+    x = full.T.astype(np.float32)
+    y = np.empty((2, SEQUENCE_LENGTH), dtype=np.float32)
+    y[0] = table.column("t0").to_numpy(zero_copy_only=False).astype(np.float32)
+    y[1] = table.column("t1").to_numpy(zero_copy_only=False).astype(np.float32)
+    is_scored = table.column("is_scored").to_numpy(zero_copy_only=False).astype(bool)
+    return x, y, is_scored
+
+
+def iter_eval_batches(pf, group_indices, means, stds, batch_size):
+    """Same idea as iter_train_batches but for evaluation: sequential (no
+    shuffle needed), streamed directly from disk, never holding more than
+    batch_size sequences in memory. Used to stream the full 1,873-sequence
+    valid.parquet at the end of every epoch without ever loading it all
+    at once. Also yields the is_scored mask per sequence (see
+    read_one_eval_sequence) so evaluate_streaming can score exactly the
+    rows the real metric scores."""
     n_ch = n_input_channels()
-    X = np.empty((len(group_indices), n_ch, SEQUENCE_LENGTH), dtype=np.float32)
-    Y = np.empty((len(group_indices), 2, SEQUENCE_LENGTH), dtype=np.float32)
-    for i, gi in enumerate(group_indices):
-        X[i], Y[i] = read_one_sequence(pf, gi, means, stds)
-        if (i + 1) % 25 == 0:
-            print(f"  [{desc}] loaded {i+1}/{len(group_indices)}", flush=True)
-    return torch.from_numpy(X), torch.from_numpy(Y)
+    for start in range(0, len(group_indices), batch_size):
+        chunk = group_indices[start:start + batch_size]
+        X = np.empty((len(chunk), n_ch, SEQUENCE_LENGTH), dtype=np.float32)
+        Y = np.empty((len(chunk), 2, SEQUENCE_LENGTH), dtype=np.float32)
+        is_scored_batch = np.empty((len(chunk), SEQUENCE_LENGTH), dtype=bool)
+        for i, gi in enumerate(chunk):
+            X[i], Y[i], is_scored_batch[i] = read_one_eval_sequence(pf, gi, means, stds)
+        yield torch.from_numpy(X), torch.from_numpy(Y), is_scored_batch
 
 
 def iter_train_batches(pf, group_indices, means, stds, rng):
@@ -162,18 +208,63 @@ def iter_train_batches(pf, group_indices, means, stds, rng):
         yield torch.from_numpy(X), torch.from_numpy(Y)
 
 
-def evaluate(model, loss_fn, X_valid, Y_valid):
+def evaluate_streaming(model, loss_fn, parquet_path, group_indices, means, stds, batch_size, desc="valid"):
+    """Streaming validation over a fixed set of sequences too large to hold
+    in memory at once (all 1,873 of valid.parquet — ~16.8GB as float32
+    features alone, over the 16GB budget). Reads batch_size sequences at a
+    time, evaluates, discards, and moves on.
+
+    The reported score is now the **real WP metric**, not an approximation
+    of it: predictions/targets for every sequence are fed straight into
+    `utils.BlockAccumulator` — the competition's own scoring class (clips
+    to [-2,2], weights by |clipped target|, restricts to is_scored rows,
+    computes weighted Pearson per sequence, averages t0/t1, then averages
+    equally across sequences) — so "best val score" during training is
+    now literally comparable to what the leaderboard reports, not a proxy
+    that happens to correlate with it. (The previous version computed an
+    unweighted, unclipped, non-is_scored-filtered pooled correlation —
+    correct as *that* statistic, but not the same quantity as WP; see
+    model_training.md for why that gap plausibly explains the earlier
+    "more validation data, slightly worse leaderboard score" result —
+    tightening an estimate of the wrong target doesn't help the real one.)
+
+    val_loss is still computed over every need_prediction row (unweighted
+    by is_scored), matching exactly what the training loss itself uses —
+    is_scored is never available at real inference time, so the training
+    objective can't depend on it; this keeps val_loss and train_loss
+    directly comparable for diagnosing over/underfitting, while the score
+    used for checkpoint selection is the metric-faithful one above.
+    """
     model.eval()
+    pf = pq.ParquetFile(parquet_path)
+    accumulator = BlockAccumulator()
+
+    total_loss = 0.0
+    n_seq_seen = 0
+
     with torch.no_grad():
-        pred = model(X_valid)
-        val_loss = loss_fn(pred[:, :, WARMUP:], Y_valid[:, :, WARMUP:]).item()
-        p0 = pred[:, 0, WARMUP:].reshape(-1).cpu().numpy()
-        y0 = Y_valid[:, 0, WARMUP:].reshape(-1).cpu().numpy()
-        p1 = pred[:, 1, WARMUP:].reshape(-1).cpu().numpy()
-        y1 = Y_valid[:, 1, WARMUP:].reshape(-1).cpu().numpy()
-        corr0 = float(np.corrcoef(p0, y0)[0, 1])
-        corr1 = float(np.corrcoef(p1, y1)[0, 1])
-    return val_loss, corr0, corr1
+        for b, (xb, yb, is_scored_batch) in enumerate(
+                iter_eval_batches(pf, group_indices, means, stds, batch_size)):
+            xb_d = xb.to(DEVICE)
+            yb_d = yb.to(DEVICE)
+            pred = model(xb_d)
+
+            batch_loss = loss_fn(pred[:, :, WARMUP:], yb_d[:, :, WARMUP:]).item()
+            total_loss += batch_loss * xb.shape[0]
+            n_seq_seen += xb.shape[0]
+
+            pred_np = pred.cpu().numpy().astype(np.float32)  # (batch, 2, 20000)
+            targets_np = yb.numpy()                          # (batch, 2, 20000), already float32
+
+            for i in range(xb.shape[0]):
+                accumulator.add(targets_np[i].T, pred_np[i].T, is_scored_batch[i])
+
+            if (b + 1) % 20 == 0:
+                print(f"  [{desc}] {n_seq_seen}/{len(group_indices)} sequences", flush=True)
+
+    val_loss = total_loss / max(n_seq_seen, 1)
+    result = accumulator.result()
+    return val_loss, result["t0"], result["t1"]
 
 
 def save_checkpoint(path, model, opt, sched, epoch, best_score, n_input):
@@ -207,13 +298,13 @@ def main():
         train_groups = train_groups[:N_TRAIN_SEQUENCES]
     print(f"train sequences: {len(train_groups)} of {n_train_available} available")
 
-    valid_sample_path = EDA_ARTIFACTS_DIR / "valid_sample.parquet"
-    n_valid_available = pq.ParquetFile(valid_sample_path).num_row_groups
-    valid_groups = list(range(min(N_VALID_SEQUENCES, n_valid_available)))
-    print(f"loading {len(valid_groups)} validation sequences (fixed set, held out from all training)...")
-    X_valid, Y_valid = load_fixed_set(valid_sample_path, valid_groups, means, stds, desc="valid")
-    X_valid = X_valid.to(DEVICE)
-    Y_valid = Y_valid.to(DEVICE)
+    n_valid_available = pq.ParquetFile(VALID_PATH).num_row_groups
+    valid_groups = list(range(n_valid_available))
+    if N_VALID_SEQUENCES is not None:
+        valid_groups = valid_groups[:N_VALID_SEQUENCES]
+    print(f"validation: {len(valid_groups)} of {n_valid_available} sequences in the real valid.parquet "
+          f"(streamed {VALID_BATCH_SIZE} at a time at the end of every epoch — never held fully in "
+          f"memory, held out from all training)")
 
     model = CausalTCN(n_input=n_input, channels=N_CHANNELS, dilations=DILATIONS,
                        dropout=DROPOUT).to(DEVICE)
@@ -285,14 +376,15 @@ def main():
             epoch_elapsed = time.time() - epoch_t0
 
             if (epoch + 1) % VALIDATE_EVERY_N_EPOCHS == 0 or epoch == N_EPOCHS - 1:
-                val_loss, corr0, corr1 = evaluate(model, loss_fn, X_valid, Y_valid)
-                score = (corr0 + corr1) / 2
+                val_loss, wp_t0, wp_t1 = evaluate_streaming(
+                    model, loss_fn, VALID_PATH, valid_groups, means, stds, VALID_BATCH_SIZE)
+                score = (wp_t0 + wp_t1) / 2  # == BlockAccumulator's own "weighted_pearson" field
                 is_best = score > best_score
                 if is_best:
                     best_score = score
                     save_checkpoint(best_path, model, opt, sched, epoch, best_score, n_input)
                 log(f"epoch {epoch+1}/{N_EPOCHS}  train_loss={train_loss:.4f}  "
-                    f"val_loss={val_loss:.4f}  val_corr_t0={corr0:.4f}  val_corr_t1={corr1:.4f}  "
+                    f"val_loss={val_loss:.4f}  val_wp_t0={wp_t0:.4f}  val_wp_t1={wp_t1:.4f}  "
                     f"{'*best*' if is_best else ''}  "
                     f"(epoch {epoch_elapsed/60:.1f} min, total {((time.time()-t_start)/60):.1f} min)")
 
@@ -303,7 +395,7 @@ def main():
             f"(re-run with RESUME_FROM = '{latest_path}' to continue)")
         return
 
-    log(f"\ndone. best val score (mean corr) = {best_score:.4f}")
+    log(f"\ndone. best val score (real WP metric, mean of t0/t1) = {best_score:.4f}")
     log(f"best checkpoint: {best_path}")
     log(f"latest checkpoint: {latest_path}")
     log("\nnext step: run extract_numpy_weights.py to convert the checkpoint into the "

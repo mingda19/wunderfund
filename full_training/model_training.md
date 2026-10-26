@@ -21,10 +21,42 @@ on them, and discarding — at any moment only one batch's worth of data
 (tens of MB) is in memory, regardless of how many total sequences you
 train on.
 
-The validation set is still loaded fully into memory once (default: 100
-sequences from `eda/artifacts/valid_sample.parquet`, the same held-out
-sample used throughout `eda/notes.md`) since it's small and reused every
-epoch — no reason to re-read it from disk each time.
+**Update, revised twice now — read this history, it matters**: validation
+now streams too, and what it computes has changed.
+
+1. *Originally*: a fixed 100-sequence sample (`eda/artifacts/valid_sample.parquet`)
+   loaded fully into memory once, small enough to reuse every epoch.
+2. *First revision*: switched to streaming all 1,873 sequences of the
+   real `valid.parquet` (16.8GB as float32 features alone — over the 16GB
+   budget held in memory at once, hence streaming `VALID_BATCH_SIZE` at a
+   time), computing an exact single-pass **pooled, unweighted, unclipped**
+   Pearson correlation across every `need_prediction` row. This is where
+   it stopped being a strict improvement: the real submitted score with
+   this checkpoint came back *slightly worse* than the 100-sequence-sample
+   run's, not better.
+3. *Root cause, and this revision*: the pooled-correlation proxy was never
+   the same statistic as the real WP metric — it didn't restrict to
+   `is_scored` rows, didn't clip to [-2,2], and pooled every row globally
+   instead of computing per-sequence weighted correlation and averaging
+   equally across sequences (the real metric's actual structure, per
+   `docs/data_overview.md`). Validating against more data made the
+   *proxy* estimate more precise, but a more precise estimate of the
+   wrong quantity doesn't guarantee a better real score — which is
+   exactly consistent with what was observed. Fixed by dropping the
+   hand-rolled statistic entirely and feeding every sequence's
+   predictions/targets straight into **`utils.BlockAccumulator`** — the
+   competition's own scoring class, imported and used verbatim, not
+   reimplemented. "Best val score" during training is now the literal WP
+   metric on the validation set. Verified **bit-identical to 6 decimal
+   places** against the independently-written `eda/scripts/eval_harness.py`
+   path (which already used `BlockAccumulator` correctly) on the same
+   checkpoint and sequences, before trusting this.
+
+`val_loss` (separate from the score used for checkpoint selection) is
+still computed over every `need_prediction` row, matching the training
+loss exactly — `is_scored` is never available at real inference time, so
+the training objective can't use it, and this keeps train/val loss
+directly comparable for diagnosing over/underfitting.
 
 ## What the warnings in your earlier run were (not related to this, but you asked)
 
@@ -70,7 +102,8 @@ place kernel size lives).
 | Knob | Default | Notes |
 |---|---|---|
 | `N_TRAIN_SEQUENCES` | `None` (= all 10,607) | Set an int to cap for a faster/smaller run. |
-| `N_VALID_SEQUENCES` | 100 | Out of the 150 available in `valid_sample.parquet`. |
+| `N_VALID_SEQUENCES` | `None` | `None` = all 1,873 sequences in the real `valid.parquet`; set an int to cap. |
+| `VALID_BATCH_SIZE` | 32 | Sequences per streaming-validation batch — no backward pass, so can exceed `BATCH_SIZE`. |
 | `TRAIN_SEED` | 0 | Shuffle order, changes every epoch regardless (re-derived from this seed + epoch via `rng.permutation`, so epochs don't repeat the same batch order). |
 | `USE_PLS` | `False` | Appends the 20-dim supervised PLS projection (`eda/scripts/pls_transform.py`) as extra input channels. `eda/notes.md` §11 found this added 51% inference latency for a 0.0013 WP gain on the 600-sequence model — not worth it there, but that was a much smaller/less-trained model; worth re-testing once you have a full-data baseline to compare against. |
 
@@ -82,7 +115,7 @@ place kernel size lives).
 | `LEARNING_RATE` | 2e-3 | Adam, cosine-annealed to ~0 over `N_EPOCHS`. |
 | `WEIGHTED_LOSS` | `True` | MSE weighted by `\|clip(target,-2,2)\|`, mirroring the WP metric. This was the single biggest lever in every experiment so far (0.546→0.609 WP on the 600-seq model) — strongly recommend leaving it on. |
 | `GRAD_CLIP` | 1.0 | Set to `None` to disable. Not used in the earlier dev-scale runs; added here as cheap insurance for a long unattended run. |
-| `VALIDATE_EVERY_N_EPOCHS` | 1 | Raise if validation overhead matters (it shouldn't — it's one forward pass over 100 sequences, no backward). |
+| `VALIDATE_EVERY_N_EPOCHS` | 1 | Now a real cost to weigh, unlike before: streaming all 1,873 validation sequences from disk once per epoch adds roughly 15-25 minutes total across a 15-epoch run (see runtime estimate below). Raise this if that's too much — e.g. `2` validates every other epoch, roughly halving the added cost, at the price of coarser checkpoint granularity. |
 
 ### Output / resuming
 | Knob | Default | Notes |
@@ -113,6 +146,17 @@ references), and separately verified `extract_numpy_weights.py` end-to-end
 against an existing checkpoint — round-tripped its weights through the
 `.npz` format and confirmed the resulting model produces **bit-identical**
 predictions (0.0 max diff over 300 steps) to a direct in-memory extraction.
+`evaluate_streaming`'s current (`BlockAccumulator`-based) scoring was
+checked the same way, but for real: loaded an actual trained checkpoint
+(`runs/tcn_full_best.pt`), ran it through `evaluate_streaming` on 5
+validation sequences, then separately ran the exact same checkpoint
+through the independently-written `eda/scripts/eval_harness.py` (which
+also uses `BlockAccumulator`, but via its own streaming-inference code
+path, not this file's batched one) on the same 5 sequences — both gave
+**t0=0.671639, t1=0.704084, mean=0.687862**, matching to 6 decimal
+places. That's two independently-written code paths agreeing exactly,
+which is about as strong a correctness signal as is available without
+a full submission.
 
 ## Expected runtime (estimate, not measured for the full run)
 
@@ -127,10 +171,16 @@ Extrapolated from this session's actual measurements on this machine
   overlapped — see "possible speedup" below): **~58ms/sequence**.
 
 At the defaults (all 10,607 sequences, 15 epochs): **≈10.3 min/epoch ×
-15 ≈ 2.6 hours**. Scales roughly linearly with `N_EPOCHS` and with
-`N_TRAIN_SEQUENCES`; scales with `N_CHANNELS`/`len(DILATIONS)` on the
-compute side only (I/O cost is fixed per sequence regardless of model
-size).
+15 ≈ 2.6 hours** for training alone. Scales roughly linearly with
+`N_EPOCHS` and with `N_TRAIN_SEQUENCES`; scales with
+`N_CHANNELS`/`len(DILATIONS)` on the compute side only (I/O cost is fixed
+per sequence regardless of model size).
+
+**Plus validation**, now that it streams all 1,873 real `valid.parquet`
+sequences every epoch instead of a fixed 100-sequence in-memory sample: at
+a similar ~20-30 seq/s I/O rate, that's roughly 60-90s per validation
+pass × 15 epochs ≈ **15-25 extra minutes**, bringing the realistic total
+to **~2.9-3.0 hours** at the defaults.
 
 **Possible future speedup, not implemented**: overlapping disk I/O with
 GPU compute (e.g. a PyTorch `DataLoader` with `num_workers>0` prefetching
@@ -158,12 +208,20 @@ bottleneck for iterating on hyperparameters.
    edit the one line in `solution.py`. `standardization.npz` does not
    need to change (it's derived from `train_full_stats.json`, independent
    of any specific training run).
-4. **Before trusting the new number**: re-run the same held-out
-   evaluation used throughout `eda/notes.md` (50 sequences, indices
-   30-79 of `valid_sample.parquet`, via `eda/scripts/eval_harness.py`) to
-   get a comparable WP figure against the 0.6087 baseline documented
-   there, before spending time on a full `ScorerStepByStep` run against
-   the real `valid.parquet` (~40+ min, longer if you widened the model).
+4. **Before trusting the new number**: note that the old "held-out 50
+   sequences, indices 30-79 of `valid_sample.parquet`" check used
+   throughout earlier `eda/notes.md` phases is **no longer a clean
+   comparison** — those 50 sequences are a subset of the same
+   `valid.parquet` this run now uses in full for checkpoint selection, so
+   they've been "seen" (for model selection, not training) just like the
+   rest. The training log's own "best val score" is now your fairest
+   local signal (computed over all 1,873 sequences, the same protocol
+   every run uses). For a truly independent check before spending a
+   submission, either run the full `ScorerStepByStep` against real
+   `valid.parquet` (~40+ min, longer if you widened the model — this is
+   still not "blind" in the strict sense, but it's the authoritative
+   scoring path) or carve a fresh held-out slice from `train.parquet`
+   that no run has trained or validated on (not built here).
 5. Update `wunderfund/solution/MODEL.md` with the new numbers and
    training recipe (sequence count actually used, final architecture,
    epochs) — keep that file as the source of truth for what's currently
